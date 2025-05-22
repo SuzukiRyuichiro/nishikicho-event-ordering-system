@@ -1,6 +1,7 @@
+
 import Link from 'next/link';
 import NavItem from './NavItem';
-import { ListOrdered, Users, Soup } from 'lucide-react';
+import { ListOrdered, Users, Soup, GlassWater } from 'lucide-react';
 
 export default function Header() {
   return (
@@ -9,12 +10,15 @@ export default function Header() {
         <Link href="/" className="text-xl font-semibold text-primary hover:text-primary/80 transition-colors">
           Nishikicho Event App
         </Link>
-        <nav className="flex items-center space-x-2 sm:space-x-4">
+        <nav className="flex items-center space-x-1 sm:space-x-2">
           <NavItem href="/tabs" icon={<Users className="h-4 w-4 sm:h-5 sm:w-5" />}>
             Tabs
           </NavItem>
           <NavItem href="/kitchen" icon={<Soup className="h-4 w-4 sm:h-5 sm:w-5" />}>
             Kitchen
+          </NavItem>
+          <NavItem href="/beverages" icon={<GlassWater className="h-4 w-4 sm:h-5 sm:w-5" />}>
+            Beverages
           </NavItem>
         </nav>
       </div>

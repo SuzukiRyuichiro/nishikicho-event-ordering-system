@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import OrderStatusBadge from '@/app/components/shared/OrderStatusBadge';
 import OrderItemDisplay from '@/app/components/shared/OrderItemDisplay';
-import { Clock, Hash, CheckCircle, Trash2 } from 'lucide-react'; // UserCircle removed
+import { Clock, Hash, CheckCircle, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface KitchenOrderCardProps {
@@ -14,9 +14,7 @@ interface KitchenOrderCardProps {
 }
 
 export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: KitchenOrderCardProps) {
-  // Simplified: Border is consistent, or could be based on pending only
   const cardBorderColor = order.status === 'Pending' ? 'border-primary' : 'border-muted';
-
 
   const renderActionButtons = () => {
     switch (order.status) {
@@ -26,6 +24,7 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
             size="sm" 
             onClick={() => onUpdateStatus(order.id, 'Completed')} 
             className="w-full text-xs bg-green-500 hover:bg-green-600 text-white"
+            aria-label={`Mark order for tab ${order.tabName} as Completed`}
           >
             <CheckCircle className="mr-1 h-3 w-3" /> Mark as Completed
           </Button>
@@ -38,6 +37,7 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
               size="sm"
               onClick={() => onDismiss(order.id)}
               className="w-full text-xs"
+              aria-label={`Dismiss completed order for tab ${order.tabName}`}
             >
               <Trash2 className="mr-1 h-3 w-3" /> Dismiss
             </Button>
@@ -57,8 +57,6 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
             <CardTitle className="text-lg text-primary flex items-center">
               <Hash className="h-4 w-4 mr-1 text-muted-foreground" /> Tab: {order.tabName}
             </CardTitle>
-            {/* GuestName display removed from order card */}
-            {/* <CardDescription> can be used for order ID or other details if needed */}
           </div>
           <OrderStatusBadge status={order.status} className="text-xs whitespace-nowrap" />
         </div>

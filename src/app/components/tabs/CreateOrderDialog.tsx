@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -12,96 +12,115 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Trash2, ShoppingCart } from 'lucide-react'; // User icon removed
-import type { Order, OrderItem } from '@/lib/types'; // Guest type import removed
-import { MENU_ITEMS } from '@/lib/types';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Badge } from '@/components/ui/badge';
+import { ShoppingCart, Trash2, XCircle } from 'lucide-react';
+import type { Order, OrderItem, MenuItem } from '@/lib/types';
+import { DEFAULT_MENU_ITEMS, LOCAL_STORAGE_BEVERAGES_KEY } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-// cn import removed as it's not used
+import { cn } from '@/lib/utils';
 
 interface CreateOrderDialogProps {
   tabId: string;
   tabName: string;
-  // guests prop removed
   onCreateOrder: (newOrder: Order) => void;
 }
 
-interface NewOrderItem extends Partial<OrderItem> {
-  tempId: string; // For list key
-  itemId?: string;
-  quantity?: number;
-  notes?: string;
-}
+const slugify = (text: string) => text.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
 
 export default function CreateOrderDialog({ tabId, tabName, onCreateOrder }: CreateOrderDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  // selectedGuestId state removed
-  const [orderItems, setOrderItems] = useState<NewOrderItem[]>([]);
+  const [currentOrderItems, setCurrentOrderItems] = useState<OrderItem[]>([]);
+  const [availableBeverages, setAvailableBeverages] = useState<MenuItem[]>(DEFAULT_MENU_ITEMS);
   const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
       // Reset form when dialog opens
-      // setSelectedGuestId(undefined); // Removed
-      setOrderItems([{ tempId: Date.now().toString(), quantity: 1 }]);
+      setCurrentOrderItems([]);
+      // Load beverages from localStorage or use defaults
+      const storedBeverages = localStorage.getItem(LOCAL_STORAGE_BEVERAGES_KEY);
+      if (storedBeverages) {
+        try {
+          const parsedBeverages: MenuItem[] = JSON.parse(storedBeverages);
+          if (parsedBeverages.length > 0) {
+            setAvailableBeverages(parsedBeverages);
+          } else {
+            setAvailableBeverages(DEFAULT_MENU_ITEMS); // Fallback if stored is empty array
+          }
+        } catch (error) {
+          console.error('Failed to parse stored beverages for order dialog:', error);
+          setAvailableBeverages(DEFAULT_MENU_ITEMS); // Fallback on error
+        }
+      } else {
+        setAvailableBeverages(DEFAULT_MENU_ITEMS); // Fallback if nothing in local storage
+      }
     }
   }, [isOpen]);
 
-  const handleAddOrderItem = () => {
-    setOrderItems([...orderItems, { tempId: Date.now().toString(), quantity: 1 }]);
+  const handleBeverageClick = (beverage: MenuItem) => {
+    setCurrentOrderItems(prevItems => {
+      const existingItemIndex = prevItems.findIndex(item => item.itemId === beverage.id);
+      if (existingItemIndex > -1) {
+        // Increment quantity
+        const updatedItems = [...prevItems];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + 1,
+        };
+        return updatedItems;
+      } else {
+        // Add new item
+        return [...prevItems, { 
+          id: Date.now().toString() + Math.random().toString(), // temp client-side id for list
+          itemId: beverage.id, 
+          name: beverage.name, 
+          quantity: 1 
+        }];
+      }
+    });
   };
 
-  const handleRemoveOrderItem = (tempId: string) => {
-    setOrderItems(orderItems.filter(item => item.tempId !== tempId));
+  const handleRemoveItem = (itemIdToRemove: string) => {
+    setCurrentOrderItems(prevItems => {
+        const itemIndex = prevItems.findIndex(item => item.itemId === itemIdToRemove);
+        if (itemIndex === -1) return prevItems;
+
+        const updatedItems = [...prevItems];
+        if (updatedItems[itemIndex].quantity > 1) {
+            updatedItems[itemIndex].quantity -=1;
+            return updatedItems;
+        } else {
+            return updatedItems.filter(item => item.itemId !== itemIdToRemove);
+        }
+    });
   };
 
-  const handleOrderItemChange = (tempId: string, field: keyof Pick<OrderItem, 'quantity' | 'notes'>, value: any) => {
-    setOrderItems(orderItems.map(item =>
-      item.tempId === tempId ? { ...item, [field]: value } : item
-    ));
-  };
-  
-  const handleMenuItemSelect = (tempId: string, menuItemId: string) => {
-    const selectedMenuItem = MENU_ITEMS.find(mi => mi.id === menuItemId);
-    if (selectedMenuItem) {
-      setOrderItems(orderItems.map(item =>
-        item.tempId === tempId ? { ...item, itemId: menuItemId, name: selectedMenuItem.name } : item
-      ));
-    }
+  const handleClearOrder = () => {
+    setCurrentOrderItems([]);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const finalOrderItems = orderItems.filter(item => item.itemId && item.name && item.quantity && item.quantity > 0).map(item => ({
-      id: Date.now().toString() + Math.random(), // Mock ID
-      itemId: item.itemId!,
-      name: item.name!,
-      quantity: item.quantity!,
-      notes: item.notes,
-    }));
-
-    if (finalOrderItems.length === 0) {
+  const handleSubmit = () => {
+    if (currentOrderItems.length === 0) {
       toast({
         title: 'Error',
-        description: 'Please add at least one valid item to the order.',
+        description: 'Please add at least one item to the order.',
         variant: 'destructive',
       });
       return;
     }
 
-    // const selectedGuest = guests.find(g => g.id === selectedGuestId); // Removed
-
     const newOrder: Order = {
       id: Date.now().toString(), // Mock ID
       tabId,
       tabName,
-      // guestId and guestName removed
-      items: finalOrderItems,
-      status: 'Pending', // Default to Pending
+      items: currentOrderItems.map(item => ({ // Ensure no extra fields are passed
+        id: item.id, // This is a temp client-side ID, server should generate real one
+        itemId: item.itemId,
+        name: item.name,
+        quantity: item.quantity,
+      })),
+      status: 'Pending',
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -109,10 +128,14 @@ export default function CreateOrderDialog({ tabId, tabName, onCreateOrder }: Cre
     onCreateOrder(newOrder);
     toast({
       title: 'Success',
-      description: `Order created successfully.`,
+      description: `Order created for ${tabName}.`,
     });
     setIsOpen(false);
   };
+
+  const totalItemsInOrder = useMemo(() => {
+    return currentOrderItems.reduce((sum, item) => sum + item.quantity, 0);
+  }, [currentOrderItems]);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -121,78 +144,70 @@ export default function CreateOrderDialog({ tabId, tabName, onCreateOrder }: Cre
           <ShoppingCart className="mr-2 h-4 w-4" /> Create New Order
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg md:max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-2xl md:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Create New Order for Tab: {tabName}</DialogTitle>
           <DialogDescription>
-            Add items to the order. It will be marked as 'Pending'.
+            Click on beverages to add them to the order. Current status will be 'Pending'.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto pr-2 space-y-4 py-4">
-          {/* Assign to Guest Select field removed */}
-
-          <Label className="block text-sm font-medium">Order Items</Label>
-          <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
-            {orderItems.map((item, index) => (
-              <div key={item.tempId} className="p-3 border rounded-md bg-muted/30 space-y-2">
-                <div className="flex justify-between items-center">
-                  <p className="text-xs font-semibold text-muted-foreground">Item #{index + 1}</p>
-                  {orderItems.length > 1 && (
-                     <Button type="button" variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveOrderItem(item.tempId)}>
-                       <Trash2 className="h-4 w-4 text-destructive" />
-                     </Button>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  <div>
-                    <Label htmlFor={`item-name-${item.tempId}`} className="text-xs">Item</Label>
-                    <Select
-                      value={item.itemId}
-                      onValueChange={(value) => handleMenuItemSelect(item.tempId, value)}
-                    >
-                      <SelectTrigger id={`item-name-${item.tempId}`}>
-                        <SelectValue placeholder="Select an item" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MENU_ITEMS.map(menuItem => (
-                          <SelectItem key={menuItem.id} value={menuItem.id}>{menuItem.name} ({menuItem.category})</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor={`item-quantity-${item.tempId}`} className="text-xs">Quantity</Label>
-                    <Input
-                      id={`item-quantity-${item.tempId}`}
-                      type="number"
-                      min="1"
-                      value={item.quantity ?? 1}
-                      onChange={(e) => handleOrderItemChange(item.tempId, 'quantity', parseInt(e.target.value) || 1)}
-                      className="w-full"
-                      required
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label htmlFor={`item-notes-${item.tempId}`} className="text-xs">Notes (Optional)</Label>
-                  <Textarea
-                    id={`item-notes-${item.tempId}`}
-                    value={item.notes ?? ''}
-                    onChange={(e) => handleOrderItemChange(item.tempId, 'notes', e.target.value)}
-                    placeholder="e.g., No onions, extra ice"
-                    rows={2}
-                  />
-                </div>
+        
+        <div className="flex flex-col md:flex-row gap-4 flex-grow overflow-hidden py-4">
+          {/* Beverage Grid */}
+          <div className="md:w-2/3 flex-shrink-0">
+            <h3 className="text-sm font-medium mb-2 text-muted-foreground">Available Beverages</h3>
+            <ScrollArea className="h-64 md:h-full pr-3 border rounded-md">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 p-2">
+                {availableBeverages.map((beverage) => (
+                  <Button
+                    key={beverage.id}
+                    variant="outline"
+                    className="h-auto py-3 flex flex-col items-center justify-center text-center break-words whitespace-normal shadow-sm hover:shadow-md"
+                    onClick={() => handleBeverageClick(beverage)}
+                  >
+                    <span className="text-sm font-medium">{beverage.name}</span>
+                    <span className="text-xs text-muted-foreground">{beverage.category}</span>
+                  </Button>
+                ))}
               </div>
-            ))}
+            </ScrollArea>
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={handleAddOrderItem} className="w-full">
-            <PlusCircle className="mr-2 h-4 w-4" /> Add Another Item
-          </Button>
-        </form>
+
+          {/* Current Order Summary */}
+          <div className="md:w-1/3 flex flex-col border rounded-md p-3 bg-muted/30 shadow-inner">
+            <h3 className="text-sm font-medium mb-2 flex justify-between items-center text-muted-foreground">
+              <span>Current Order</span>
+              {totalItemsInOrder > 0 && <Badge variant="secondary">{totalItemsInOrder} item(s)</Badge>}
+            </h3>
+            <ScrollArea className="flex-grow h-48 md:h-auto">
+              {currentOrderItems.length === 0 ? (
+                <p className="text-xs text-center text-muted-foreground py-4">No items added yet.</p>
+              ) : (
+                <ul className="space-y-1 text-xs">
+                  {currentOrderItems.map(item => (
+                    <li key={item.itemId} className="flex justify-between items-center p-1.5 bg-background rounded">
+                      <span>{item.name} x {item.quantity}</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleRemoveItem(item.itemId)}>
+                        <XCircle className="h-3.5 w-3.5 text-destructive" />
+                      </Button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </ScrollArea>
+            {currentOrderItems.length > 0 && (
+              <Button variant="outline" size="sm" onClick={handleClearOrder} className="mt-3 w-full text-xs">
+                <Trash2 className="mr-1 h-3 w-3" /> Clear All Items
+              </Button>
+            )}
+          </div>
+        </div>
+
         <DialogFooter className="mt-auto pt-4 border-t">
           <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-          <Button type="submit" formNoValidate onClick={handleSubmit}>Create Order</Button>
+          <Button type="button" onClick={handleSubmit} disabled={currentOrderItems.length === 0}>
+            Create Order ({totalItemsInOrder})
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
