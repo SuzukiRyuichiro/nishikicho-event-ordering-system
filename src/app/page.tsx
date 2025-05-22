@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, Soup, ArrowRight } from 'lucide-react';
+import { Users, Martini, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HomePage() {
@@ -12,7 +12,7 @@ export default function HomePage() {
         </CardHeader>
         <CardContent>
           <p className="mb-6">
-            お客さん管理画面で、オーダーの登録、最後の会計などができます。キッチン画面では、入ってきたオーダーの一覧、オーダーの処理などの操作ができます
+            お客さん管理画面で、オーダーの登録、最後の会計などができます。バー画面では、入ってきたオーダーの一覧、オーダーの処理などの操作ができます
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FeatureLink
@@ -23,9 +23,9 @@ export default function HomePage() {
             />
             <FeatureLink
               href="/kitchen"
-              icon={<Soup className="h-8 w-8 text-accent" />}
-              title="キッチン"
-              description="注文を表示し、ステータスを確認し、キッチンの作業を管理します。"
+              icon={<Martini className="h-8 w-8 text-accent" />}
+              title="バー"
+              description="注文を表示し、ステータスを確認し、バーの作業を管理します。"
             />
           </div>
         </CardContent>

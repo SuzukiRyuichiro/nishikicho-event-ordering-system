@@ -30,8 +30,8 @@ export default function BeveragesClientPage() {
         console.error('Failed to parse stored beverages:', error);
         setBeveragesText(DEFAULT_MENU_ITEMS.map(b => b.name).join('\n'));
          toast({
-          title: 'Warning',
-          description: 'Could not load custom beverages, loaded defaults.',
+          title: '警告',
+          description: 'カスタムドリンクの読み込みに失敗したため、デフォルトを読み込みました。',
           variant: 'destructive',
         });
       }
@@ -49,8 +49,8 @@ export default function BeveragesClientPage() {
 
     if (beverageNames.length === 0) {
       toast({
-        title: 'Error',
-        description: 'Please enter at least one beverage name.',
+        title: 'エラー',
+        description: '少なくとも1つのドリンク名を入力してください。',
         variant: 'destructive',
       });
       return;
@@ -64,43 +64,42 @@ export default function BeveragesClientPage() {
 
     localStorage.setItem(LOCAL_STORAGE_BEVERAGES_KEY, JSON.stringify(newBeverageList));
     toast({
-      title: 'Success',
-      description: 'Beverage list updated successfully!',
+      title: '成功',
+      description: 'ドリンクリストが正常に更新されました！',
     });
   };
-  
+
   if (!mounted) {
-    return <div className="text-center py-10">Loading beverage settings...</div>;
+    return <div className="text-center py-10">ドリンク設定を読み込み中...</div>;
   }
 
   return (
     <div className="container mx-auto py-8">
       <Card className="max-w-2xl mx-auto shadow-lg">
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">Manage Event Beverages</CardTitle>
+          <CardTitle className="text-2xl text-primary">ドリンクメニューの管理</CardTitle>
           <CardDescription>
-            Enter each beverage name on a new line. This list will be used for creating new orders.
+            各ドリンク名を1行ずつ入力してください。このリストは新しい注文を作成する際に使用されます。
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert>
             <Info className="h-4 w-4" />
-            <AlertTitle>How it works</AlertTitle>
+            <AlertTitle>使い方</AlertTitle>
             <AlertDescription>
-              The beverage list you save here will be available in the order creation dialog.
-              If this list is empty or not saved, a default list of items will be used.
-              Each beverage name will automatically get an ID (e.g., "Red Wine" becomes "red-wine").
+              ここで保存したドリンクリストは、注文作成ダイアログで利用できます。
+              このリストが空、または保存されていない場合は、デフォルトのリストが使用されます。
             </AlertDescription>
           </Alert>
           <div>
             <Label htmlFor="beveragesTextarea" className="text-sm font-medium">
-              Beverage Names (one per line)
+              ドリンク名（1行につき1つ）
             </Label>
             <Textarea
               id="beveragesTextarea"
               value={beveragesText}
               onChange={(e) => setBeveragesText(e.target.value)}
-              placeholder="e.g., Coke\nOrange Juice\nCraft Beer IPA..."
+              placeholder={"例：コーラ\nオレンジジュース\nビール..."}
               rows={10}
               className="mt-1"
             />
@@ -108,7 +107,7 @@ export default function BeveragesClientPage() {
         </CardContent>
         <CardFooter>
           <Button onClick={handleSaveBeverages} className="w-full sm:w-auto">
-            <Save className="mr-2 h-4 w-4" /> Save Beverage List
+            <Save className="mr-2 h-4 w-4" /> ドリンクメニューを保存
           </Button>
         </CardFooter>
       </Card>

@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import NavItem from './NavItem';
-import { ListOrdered, Users, Soup, GlassWater } from 'lucide-react';
+import { Users, Martini, GlassWater } from 'lucide-react';
 
 export default function Header() {
   return (
@@ -14,8 +14,8 @@ export default function Header() {
           <NavItem href="/tabs" icon={<Users className="h-4 w-4 sm:h-5 sm:w-5" />}>
             お客さん
           </NavItem>
-          <NavItem href="/kitchen" icon={<Soup className="h-4 w-4 sm:h-5 sm:w-5" />}>
-            キッチン
+          <NavItem href="/kitchen" icon={<Martini className="h-4 w-4 sm:h-5 sm:w-5" />}>
+            バー
           </NavItem>
           <NavItem href="/beverages" icon={<GlassWater className="h-4 w-4 sm:h-5 sm:w-5" />}>
             飲み物登録
