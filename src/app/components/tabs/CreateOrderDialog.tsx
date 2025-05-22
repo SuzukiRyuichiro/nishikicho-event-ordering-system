@@ -16,16 +16,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PlusCircle, Trash2, ShoppingCart, User } from 'lucide-react';
-import type { Order, OrderItem, Guest } from '@/lib/types';
+import { PlusCircle, Trash2, ShoppingCart } from 'lucide-react'; // User icon removed
+import type { Order, OrderItem } from '@/lib/types'; // Guest type import removed
 import { MENU_ITEMS } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
-import { cn } from '@/lib/utils';
+// cn import removed as it's not used
 
 interface CreateOrderDialogProps {
   tabId: string;
   tabName: string;
-  guests: Guest[];
+  // guests prop removed
   onCreateOrder: (newOrder: Order) => void;
 }
 
@@ -36,16 +36,16 @@ interface NewOrderItem extends Partial<OrderItem> {
   notes?: string;
 }
 
-export default function CreateOrderDialog({ tabId, tabName, guests, onCreateOrder }: CreateOrderDialogProps) {
+export default function CreateOrderDialog({ tabId, tabName, onCreateOrder }: CreateOrderDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedGuestId, setSelectedGuestId] = useState<string | undefined>(undefined);
+  // selectedGuestId state removed
   const [orderItems, setOrderItems] = useState<NewOrderItem[]>([]);
   const { toast } = useToast();
 
   useEffect(() => {
     if (isOpen) {
       // Reset form when dialog opens
-      setSelectedGuestId(undefined);
+      // setSelectedGuestId(undefined); // Removed
       setOrderItems([{ tempId: Date.now().toString(), quantity: 1 }]);
     }
   }, [isOpen]);
@@ -58,7 +58,7 @@ export default function CreateOrderDialog({ tabId, tabName, guests, onCreateOrde
     setOrderItems(orderItems.filter(item => item.tempId !== tempId));
   };
 
-  const handleOrderItemChange = (tempId: string, field: keyof OrderItem, value: any) => {
+  const handleOrderItemChange = (tempId: string, field: keyof Pick<OrderItem, 'quantity' | 'notes'>, value: any) => {
     setOrderItems(orderItems.map(item =>
       item.tempId === tempId ? { ...item, [field]: value } : item
     ));
@@ -72,7 +72,6 @@ export default function CreateOrderDialog({ tabId, tabName, guests, onCreateOrde
       ));
     }
   };
-
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,14 +93,13 @@ export default function CreateOrderDialog({ tabId, tabName, guests, onCreateOrde
       return;
     }
 
-    const selectedGuest = guests.find(g => g.id === selectedGuestId);
+    // const selectedGuest = guests.find(g => g.id === selectedGuestId); // Removed
 
     const newOrder: Order = {
       id: Date.now().toString(), // Mock ID
       tabId,
       tabName,
-      guestId: selectedGuestId,
-      guestName: selectedGuest?.name,
+      // guestId and guestName removed
       items: finalOrderItems,
       status: 'Pending', // Default to Pending
       createdAt: Date.now(),
@@ -127,26 +125,11 @@ export default function CreateOrderDialog({ tabId, tabName, guests, onCreateOrde
         <DialogHeader>
           <DialogTitle>Create New Order for Tab: {tabName}</DialogTitle>
           <DialogDescription>
-            Select items and assign to a guest (optional). Order will be 'Pending'.
+            Add items to the order. It will be marked as 'Pending'.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto pr-2 space-y-4 py-4">
-          <div>
-            <Label htmlFor="guest" className="flex items-center mb-1">
-              <User className="mr-2 h-4 w-4 text-muted-foreground" /> Assign to Guest (Optional)
-            </Label>
-            <Select value={selectedGuestId} onValueChange={setSelectedGuestId}>
-              <SelectTrigger id="guest">
-                <SelectValue placeholder="Select a guest or leave for tab" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="for_tab">For the Tab (General)</SelectItem>
-                {guests.map(guest => (
-                  <SelectItem key={guest.id} value={guest.id}>{guest.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {/* Assign to Guest Select field removed */}
 
           <Label className="block text-sm font-medium">Order Items</Label>
           <div className="space-y-3 max-h-64 overflow-y-auto pr-1">

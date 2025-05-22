@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -24,6 +25,7 @@ interface CreateTabDialogProps {
 export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [tabName, setTabName] = useState('');
+  const [guestCount, setGuestCount] = useState<string>('1');
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -31,14 +33,26 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
     if (!tabName.trim()) {
       toast({
         title: 'Error',
-        description: 'Tab name cannot be empty.',
+        description: 'Customer/Group Name cannot be empty.',
         variant: 'destructive',
       });
       return;
     }
+
+    const count = parseInt(guestCount, 10);
+    if (isNaN(count) || count < 0) {
+       toast({
+        title: 'Error',
+        description: 'Number of guests must be a valid positive number.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const newTab: Tab = {
       id: Date.now().toString(), // Simple ID generation for mock
       name: tabName.trim(),
+      guestCount: count > 0 ? count : undefined, // Store count if positive, else undefined
       createdAt: Date.now(),
     };
     onCreateTab(newTab);
@@ -47,6 +61,7 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
       description: `Tab "${newTab.name}" created.`,
     });
     setTabName('');
+    setGuestCount('1');
     setIsOpen(false);
   };
 
@@ -62,21 +77,35 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
           <DialogHeader>
             <DialogTitle>Create New Tab</DialogTitle>
             <DialogDescription>
-              Enter a name for the new tab. You can add guests and orders later.
+              Enter a name for the customer or group, and optionally the number of guests.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="tabName" className="text-right">
-                Tab Name
+                Name
               </Label>
               <Input
                 id="tabName"
                 value={tabName}
                 onChange={(e) => setTabName(e.target.value)}
                 className="col-span-3"
-                placeholder="e.g., Table 1, VIP Section"
+                placeholder="e.g., John Doe, Yasuda LLC"
                 required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="guestCount" className="text-right">
+                Guests
+              </Label>
+              <Input
+                id="guestCount"
+                type="number"
+                value={guestCount}
+                onChange={(e) => setGuestCount(e.target.value)}
+                className="col-span-3"
+                placeholder="e.g., 4 (optional)"
+                min="0"
               />
             </div>
           </div>

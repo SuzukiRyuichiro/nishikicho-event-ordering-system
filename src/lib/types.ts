@@ -1,11 +1,7 @@
 
 export type OrderStatus = 'Pending' | 'Completed';
 
-export interface Guest {
-  id: string;
-  name: string;
-  tabId: string;
-}
+// Guest interface is removed
 
 export interface OrderItem {
   id: string;
@@ -19,8 +15,7 @@ export interface Order {
   id: string;
   tabId: string;
   tabName: string; // Denormalized
-  guestId?: string; // Optional: order can be for the tab in general
-  guestName?: string; // Denormalized
+  // guestId and guestName are removed
   items: OrderItem[];
   status: OrderStatus;
   createdAt: number; // Unix timestamp
@@ -28,8 +23,9 @@ export interface Order {
 }
 
 export interface Tab {
-  id: string;
-  name: string;
+  id:string;
+  name: string; // Customer or Group Name
+  guestCount?: number; // Optional number of guests
   createdAt: number; // Unix timestamp
 }
 
@@ -37,7 +33,7 @@ export interface Tab {
 export const MENU_ITEMS = [
   { id: 'beer-lager', name: 'Lager Beer', category: 'Beer' },
   { id: 'beer-ipa', name: 'IPA', category: 'Beer' },
-  { id: 'wine-red- Merlot', name: 'Merlot (Red)', category: 'Wine' },
+  { id: 'wine-red-merlot', name: 'Merlot (Red)', category: 'Wine' }, // Corrected ID
   { id: 'wine-white-chardonnay', name: 'Chardonnay (White)', category: 'Wine' },
   { id: 'spirit-vodka', name: 'Vodka', category: 'Spirit' },
   { id: 'spirit-gin', name: 'Gin', category: 'Spirit' },

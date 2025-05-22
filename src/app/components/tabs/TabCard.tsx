@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import type { Tab } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,11 +7,12 @@ import { Users, ShoppingBag, ArrowRight, CalendarDays } from 'lucide-react';
 
 interface TabCardProps {
   tab: Tab;
-  guestCount: number;
-  orderCount: number;
+  orderCount: number; // Keep order count as it might be derived elsewhere or from actual orders
 }
 
-export default function TabCard({ tab, guestCount, orderCount }: TabCardProps) {
+export default function TabCard({ tab, orderCount }: TabCardProps) {
+  const guestCount = tab.guestCount ?? 0;
+
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
       <CardHeader>

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import OrderStatusBadge from '@/app/components/shared/OrderStatusBadge';
 import OrderItemDisplay from '@/app/components/shared/OrderItemDisplay';
-import { UserCircle, Clock, Hash, CheckCircle, PackageCheck, Trash2 } from 'lucide-react';
+import { Clock, Hash, CheckCircle, Trash2 } from 'lucide-react'; // UserCircle removed
 import { cn } from '@/lib/utils';
 
 interface KitchenOrderCardProps {
@@ -14,7 +14,9 @@ interface KitchenOrderCardProps {
 }
 
 export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: KitchenOrderCardProps) {
-  const cardBorderColor = order.status === 'Pending' ? 'border-gray-400' : 'border-blue-500 opacity-70';
+  // Simplified: Border is consistent, or could be based on pending only
+  const cardBorderColor = order.status === 'Pending' ? 'border-primary' : 'border-muted';
+
 
   const renderActionButtons = () => {
     switch (order.status) {
@@ -55,12 +57,8 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
             <CardTitle className="text-lg text-primary flex items-center">
               <Hash className="h-4 w-4 mr-1 text-muted-foreground" /> Tab: {order.tabName}
             </CardTitle>
-            {order.guestName && (
-              <CardDescription className="flex items-center text-sm">
-                <UserCircle className="h-4 w-4 mr-1 text-muted-foreground" />
-                For: {order.guestName}
-              </CardDescription>
-            )}
+            {/* GuestName display removed from order card */}
+            {/* <CardDescription> can be used for order ID or other details if needed */}
           </div>
           <OrderStatusBadge status={order.status} className="text-xs whitespace-nowrap" />
         </div>

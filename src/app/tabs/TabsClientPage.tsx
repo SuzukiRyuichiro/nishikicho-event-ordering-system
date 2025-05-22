@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,9 +10,10 @@ import { Search } from 'lucide-react';
 
 // Mock data - in a real app, this would come from an API
 const initialTabs: Tab[] = [
-  { id: '1', name: 'Table 101', createdAt: new Date('2024-07-20T10:00:00Z').getTime() },
-  { id: '2', name: 'Bar Area', createdAt: new Date('2024-07-20T10:05:00Z').getTime() },
-  { id: '3', name: 'VIP Lounge', createdAt: new Date('2024-07-20T10:10:00Z').getTime() },
+  { id: '1', name: 'John Doe', guestCount: 2, createdAt: new Date('2024-07-20T10:00:00Z').getTime() },
+  { id: '2', name: 'Yasuda LLC', guestCount: 5, createdAt: new Date('2024-07-20T10:05:00Z').getTime() },
+  { id: '3', name: 'VIP Guest', guestCount: 1, createdAt: new Date('2024-07-20T10:10:00Z').getTime() },
+  { id: '4', name: 'Walk-in Customer', createdAt: new Date('2024-07-20T10:12:00Z').getTime() }, // Example with no guest count
 ];
 
 export default function TabsClientPage() {
@@ -47,7 +49,7 @@ export default function TabsClientPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search tabs..."
+          placeholder="Search tabs by customer/group name..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 w-full sm:w-72"
@@ -60,8 +62,7 @@ export default function TabsClientPage() {
             <TabCard
               key={tab.id}
               tab={tab}
-              // Mock counts for guest and orders. In a real app, these would be fetched.
-              guestCount={Math.floor(Math.random() * 5)} // Example
+              // Mock order count for now.
               orderCount={Math.floor(Math.random() * 10)} // Example
             />
           ))}
