@@ -1,16 +1,16 @@
+
 import type { Order } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import OrderStatusBadge from '@/app/components/shared/OrderStatusBadge';
 import OrderItemDisplay from '@/app/components/shared/OrderItemDisplay';
-import OrderStatusSelector from '@/app/components/shared/OrderStatusSelector';
-import { UserCircle, Clock, Hash, Edit3 } from 'lucide-react';
+import { UserCircle, Clock, Hash, Zap, CheckCircle, Soup, UtensilsCrossed, PackageCheck, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface KitchenOrderCardProps {
   order: Order;
   onUpdateStatus: (orderId: string, newStatus: Order['status']) => void;
-  onDismiss?: (orderId: string) => void; // For completed/cancelled orders
+  onDismiss?: (orderId: string) => void;
 }
 
 export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: KitchenOrderCardProps) {
@@ -23,9 +23,55 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
     order.status === 'Cancelled' ? 'border-red-500 opacity-60' :
     'border-border';
 
+  const renderActionButtons = () => {
+    switch (order.status) {
+      case 'Pending':
+        return (
+          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Preparing')} className="w-full text-xs bg-yellow-500 hover:bg-yellow-600 text-white">
+            <Zap className="mr-1 h-3 w-3" /> Mark as Preparing
+          </Button>
+        );
+      case 'Preparing':
+        return (
+          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Ready')} className="w-full text-xs bg-teal-500 hover:bg-teal-600 text-white">
+            <Soup className="mr-1 h-3 w-3" /> Mark as Ready
+          </Button>
+        );
+      case 'Ready':
+        return (
+          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Served')} className="w-full text-xs bg-green-500 hover:bg-green-600 text-white">
+            <UtensilsCrossed className="mr-1 h-3 w-3" /> Mark as Served
+          </Button>
+        );
+      case 'Served':
+        return (
+          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Completed')} className="w-full text-xs bg-blue-500 hover:bg-blue-600 text-white">
+            <PackageCheck className="mr-1 h-3 w-3" /> Mark as Completed
+          </Button>
+        );
+      case 'Completed':
+      case 'Cancelled':
+        if (onDismiss) {
+          return (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onDismiss(order.id)}
+              className="w-full text-xs"
+            >
+              <Trash2 className="mr-1 h-3 w-3" /> Dismiss
+            </Button>
+          );
+        }
+        return null;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Card className={cn("shadow-md transition-all duration-300 ease-in-out transform hover:scale-[1.01]", cardBorderColor, {
-      'bg-green-50 animate-pulse- একবার': order.status === 'Ready', // Subtle pulse for "Ready"
+      'bg-green-50 animate-pulse-once': order.status === 'Ready', 
     })}>
       <style jsx>{`
         @keyframes pulse-once {
@@ -65,22 +111,8 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
           ))}
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-3">
-        <OrderStatusSelector
-          currentStatus={order.status}
-          onStatusChange={(newStatus) => onUpdateStatus(order.id, newStatus)}
-          disabled={order.status === 'Completed' || order.status === 'Cancelled'}
-        />
-        {(order.status === 'Completed' || order.status === 'Cancelled') && onDismiss && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onDismiss(order.id)}
-            className="text-xs"
-          >
-            Dismiss
-          </Button>
-        )}
+      <CardFooter className="flex flex-col items-center gap-2 pt-3">
+        {renderActionButtons()}
       </CardFooter>
     </Card>
   );

@@ -1,10 +1,10 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
 import type { Order, OrderStatus } from '@/lib/types';
 import KitchenOrderCard from '@/app/components/kitchen/KitchenOrderCard';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { RefreshCw, ArrowDownUp, ListFilter, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -42,13 +42,8 @@ const MOCK_INITIAL_ORDERS: Order[] = [
   },
 ];
 
-type SortOption = 'time_asc' | 'time_desc' | 'tab_name';
-type FilterOption = 'all_active' | 'pending' | 'preparing' | 'ready' | 'served';
-
 export default function KitchenDisplayClientPage() {
   const [orders, setOrders] = useState<Order[]>(MOCK_INITIAL_ORDERS);
-  const [sortOption, setSortOption] = useState<SortOption>('time_asc');
-  const [filterOption, setFilterOption] = useState<FilterOption>('all_active');
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const { toast } = useToast();
 
@@ -91,31 +86,11 @@ export default function KitchenDisplayClientPage() {
     // In a real app: call API to get fresh orders
   }
 
-  const filteredAndSortedOrders = useMemo(() => {
-    let processedOrders = [...orders];
-
-    // Filter
-    if (filterOption !== 'all_active') {
-      processedOrders = processedOrders.filter(order => order.status.toLowerCase() === filterOption);
-    } else {
-      // 'all_active' means not Completed or Cancelled
-      processedOrders = processedOrders.filter(order => order.status !== 'Completed' && order.status !== 'Cancelled');
-    }
-    
-    // Sort
-    switch (sortOption) {
-      case 'time_asc':
-        processedOrders.sort((a, b) => a.createdAt - b.createdAt);
-        break;
-      case 'time_desc':
-        processedOrders.sort((a, b) => b.createdAt - a.createdAt);
-        break;
-      case 'tab_name':
-        processedOrders.sort((a, b) => a.tabName.localeCompare(b.tabName) || (a.createdAt - b.createdAt));
-        break;
-    }
-    return processedOrders;
-  }, [orders, sortOption, filterOption]);
+  const activeOrdersSorted = useMemo(() => {
+    return orders
+      .filter(order => order.status !== 'Completed' && order.status !== 'Cancelled')
+      .sort((a, b) => a.createdAt - b.createdAt); // Oldest first
+  }, [orders]);
 
 
   return (
@@ -123,30 +98,6 @@ export default function KitchenDisplayClientPage() {
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4">
         <h1 className="text-3xl font-bold text-primary">Kitchen Display</h1>
         <div className="flex flex-wrap items-center gap-2">
-           <Select value={filterOption} onValueChange={(value) => setFilterOption(value as FilterOption)}>
-            <SelectTrigger className="w-full sm:w-[150px] h-9 text-xs">
-              <ListFilter className="h-3 w-3 mr-1 text-muted-foreground" />
-              <SelectValue placeholder="Filter status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all_active" className="text-xs">All Active</SelectItem>
-              <SelectItem value="pending" className="text-xs">Pending</SelectItem>
-              <SelectItem value="preparing" className="text-xs">Preparing</SelectItem>
-              <SelectItem value="ready" className="text-xs">Ready</SelectItem>
-              <SelectItem value="served" className="text-xs">Served</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={sortOption} onValueChange={(value) => setSortOption(value as SortOption)}>
-            <SelectTrigger className="w-full sm:w-[160px] h-9 text-xs">
-              <ArrowDownUp className="h-3 w-3 mr-1 text-muted-foreground" />
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="time_asc" className="text-xs">Oldest First</SelectItem>
-              <SelectItem value="time_desc" className="text-xs">Newest First</SelectItem>
-              <SelectItem value="tab_name" className="text-xs">By Tab Name</SelectItem>
-            </SelectContent>
-          </Select>
           <Button variant="outline" size="sm" onClick={handleRefresh} className="h-9 text-xs">
             <RefreshCw className="mr-2 h-3 w-3" /> Refresh
           </Button>
@@ -154,9 +105,9 @@ export default function KitchenDisplayClientPage() {
       </div>
       {lastUpdated && <p className="text-xs text-muted-foreground text-right -mt-4">Last updated: {lastUpdated.toLocaleTimeString()}</p>}
 
-      {filteredAndSortedOrders.length > 0 ? (
+      {activeOrdersSorted.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredAndSortedOrders.map((order) => (
+          {activeOrdersSorted.map((order) => (
             <KitchenOrderCard
               key={order.id}
               order={order}
@@ -168,9 +119,9 @@ export default function KitchenDisplayClientPage() {
       ) : (
         <div className="text-center py-10 rounded-lg border border-dashed">
           <XCircle className="mx-auto h-12 w-12 text-muted-foreground" />
-          <p className="mt-4 text-xl font-semibold text-muted-foreground">No orders match your current filters.</p>
+          <p className="mt-4 text-xl font-semibold text-muted-foreground">No active orders.</p>
           <p className="text-sm text-muted-foreground">
-            {filterOption === 'all_active' ? "All active orders are clear!" : "Try a different filter or wait for new orders."}
+            All caught up! Or, wait for new orders to come in.
           </p>
         </div>
       )}
