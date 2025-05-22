@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -33,15 +32,15 @@ export default function TabsClientPage() {
   const filteredTabs = tabs.filter((tab) =>
     tab.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   if (!mounted) {
-    return <div className="text-center py-10">Loading tabs...</div>; // Or a skeleton loader
+    return <div className="text-center py-10">伝票を読み込み中...</div>; // Or a skeleton loader
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <h1 className="text-3xl font-bold text-primary">Manage Tabs</h1>
+        <h1 className="text-3xl font-bold text-primary">お客さん管理</h1>
         <CreateTabDialog onCreateTab={handleCreateTab} />
       </div>
 
@@ -49,7 +48,7 @@ export default function TabsClientPage() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           type="search"
-          placeholder="Search tabs by customer/group name..."
+          placeholder="氏名・グループ名で検索..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 w-full sm:w-72"
@@ -69,8 +68,8 @@ export default function TabsClientPage() {
         </div>
       ) : (
         <div className="text-center py-10 text-muted-foreground">
-          <p className="text-xl">No tabs found.</p>
-          {searchTerm && <p>Try adjusting your search or create a new tab.</p>}
+          <p className="text-xl">お客さんが見つかりません。</p>
+          {searchTerm && <p>検索条件を変更するか、を作成してください。</p>}
         </div>
       )}
     </div>

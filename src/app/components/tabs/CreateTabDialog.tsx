@@ -69,34 +69,34 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Create New Tab
+          <PlusCircle className="mr-2 h-4 w-4" /> お客さん登録
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create New Tab</DialogTitle>
+            <DialogTitle>お客さん登録</DialogTitle>
             <DialogDescription>
-              Enter a name for the customer or group, and optionally the number of guests.
+             お客さんの名前、もしくは団体の名前を入力して下さい。
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="tabName" className="text-right">
-                Name
+                名前
               </Label>
               <Input
                 id="tabName"
                 value={tabName}
                 onChange={(e) => setTabName(e.target.value)}
                 className="col-span-3"
-                placeholder="e.g., John Doe, Yasuda LLC"
+                placeholder="e.g., 鈴木龍一郎 / 安田不動産"
                 required
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="guestCount" className="text-right">
-                Guests
+                人数
               </Label>
               <Input
                 id="guestCount"
@@ -110,8 +110,8 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-            <Button type="submit">Create Tab</Button>
+            <Button type="button" variant="outline" onClick={() => setIsOpen(false)}>キャンセル</Button>
+            <Button type="submit">登録</Button>
           </DialogFooter>
         </form>
       </DialogContent>

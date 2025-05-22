@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Nishikicho Event App',
-  description: 'Manage tabs and orders for Nishikicho events.',
+  title: '錦町地域交流会会計アプリ',
+  description: '神田錦町地域交流会のオペレーションをスムーズにするアプリ',
 };
 
 export default function RootLayout({
