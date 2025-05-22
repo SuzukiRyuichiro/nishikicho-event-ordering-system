@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Order } from '@/lib/types';
@@ -7,7 +8,7 @@ import OrderStatusBadge from '@/app/components/shared/OrderStatusBadge';
 import OrderItemDisplay from '@/app/components/shared/OrderItemDisplay';
 import CreateOrderDialog from './CreateOrderDialog';
 import type { Guest } from '@/lib/types';
-import { ShoppingBag, UserCircle, Clock } from 'lucide-react';
+import { ShoppingBag, UserCircle, Clock, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface OrderListForTabProps {
@@ -69,16 +70,15 @@ export default function OrderListForTab({ tabId, tabName, orders, guests, onCrea
                     ))}
                   </div>
                 </CardContent>
-                { (order.status === 'Ready' || order.status === 'Served') &&
+                { order.status === 'Pending' &&
                   <CardFooter className="pt-0 pb-2">
                     <Button 
                       size="sm" 
                       variant="outline"
                       onClick={() => onUpdateOrderStatus(order.id, 'Completed')}
-                      disabled={order.status === 'Completed'}
                       className="text-xs"
                     >
-                      Mark as Completed
+                      <CheckCircle className="mr-1 h-3 w-3" /> Mark as Completed
                     </Button>
                   </CardFooter>
                 }

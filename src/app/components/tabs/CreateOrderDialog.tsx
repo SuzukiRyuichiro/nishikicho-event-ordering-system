@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -102,7 +103,7 @@ export default function CreateOrderDialog({ tabId, tabName, guests, onCreateOrde
       guestId: selectedGuestId,
       guestName: selectedGuest?.name,
       items: finalOrderItems,
-      status: 'Pending',
+      status: 'Pending', // Default to Pending
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -126,7 +127,7 @@ export default function CreateOrderDialog({ tabId, tabName, guests, onCreateOrde
         <DialogHeader>
           <DialogTitle>Create New Order for Tab: {tabName}</DialogTitle>
           <DialogDescription>
-            Select items and assign to a guest (optional).
+            Select items and assign to a guest (optional). Order will be 'Pending'.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="flex-grow overflow-y-auto pr-2 space-y-4 py-4">

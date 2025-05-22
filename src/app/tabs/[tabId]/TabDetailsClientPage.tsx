@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,6 +10,7 @@ import { ArrowLeft, Edit, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+
 // Mock data - in a real app, this would come from an API based on tabId
 const MOCK_TABS: Tab[] = [
   { id: '1', name: 'Table 101', createdAt: new Date('2024-07-20T10:00:00Z').getTime() },
@@ -31,12 +33,12 @@ const MOCK_ORDERS: Order[] = [
   { 
     id: 'o2', tabId: '1', tabName: 'Table 101', guestId: 'g2', guestName: 'Bob The Builder', 
     items: [{ id: 'oi3', itemId:'wine-red- Merlot', name: 'Merlot', quantity: 1 }], 
-    status: 'Preparing', createdAt: Date.now() - 50000, updatedAt: Date.now() - 50000
+    status: 'Pending', createdAt: Date.now() - 50000, updatedAt: Date.now() - 50000
   },
   { 
     id: 'o3', tabId: '2', tabName: 'Bar Area', guestName: 'Charlie Chaplin', guestId: 'g3',
     items: [{ id: 'oi4', itemId:'spirit-gin', name: 'Gin & Tonic', quantity: 1, notes: "Double" }], 
-    status: 'Ready', createdAt: Date.now() - 20000, updatedAt: Date.now() - 20000
+    status: 'Completed', createdAt: Date.now() - 20000, updatedAt: Date.now() - 10000 // Example of a completed order
   },
 ];
 
@@ -74,6 +76,7 @@ export default function TabDetailsClientPage({ tabId }: TabDetailsClientPageProp
   };
 
   const handleUpdateOrderStatus = (orderId: string, status: Order['status']) => {
+    // With simplified statuses, this will likely always be setting to 'Completed'
     setOrders(prevOrders => 
       prevOrders.map(order => 
         order.id === orderId ? { ...order, status, updatedAt: Date.now() } : order

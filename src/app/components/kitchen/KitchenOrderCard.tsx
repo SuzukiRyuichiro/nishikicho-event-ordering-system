@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import OrderStatusBadge from '@/app/components/shared/OrderStatusBadge';
 import OrderItemDisplay from '@/app/components/shared/OrderItemDisplay';
-import { UserCircle, Clock, Hash, Zap, CheckCircle, Soup, UtensilsCrossed, PackageCheck, Trash2 } from 'lucide-react';
+import { UserCircle, Clock, Hash, CheckCircle, PackageCheck, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface KitchenOrderCardProps {
@@ -14,43 +14,21 @@ interface KitchenOrderCardProps {
 }
 
 export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: KitchenOrderCardProps) {
-  const cardBorderColor = 
-    order.status === 'Pending' ? 'border-gray-400' :
-    order.status === 'Preparing' ? 'border-yellow-500' :
-    order.status === 'Ready' ? 'border-teal-500' :
-    order.status === 'Served' ? 'border-green-500' :
-    order.status === 'Completed' ? 'border-blue-500 opacity-70' :
-    order.status === 'Cancelled' ? 'border-red-500 opacity-60' :
-    'border-border';
+  const cardBorderColor = order.status === 'Pending' ? 'border-gray-400' : 'border-blue-500 opacity-70';
 
   const renderActionButtons = () => {
     switch (order.status) {
       case 'Pending':
         return (
-          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Preparing')} className="w-full text-xs bg-yellow-500 hover:bg-yellow-600 text-white">
-            <Zap className="mr-1 h-3 w-3" /> Mark as Preparing
-          </Button>
-        );
-      case 'Preparing':
-        return (
-          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Ready')} className="w-full text-xs bg-teal-500 hover:bg-teal-600 text-white">
-            <Soup className="mr-1 h-3 w-3" /> Mark as Ready
-          </Button>
-        );
-      case 'Ready':
-        return (
-          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Served')} className="w-full text-xs bg-green-500 hover:bg-green-600 text-white">
-            <UtensilsCrossed className="mr-1 h-3 w-3" /> Mark as Served
-          </Button>
-        );
-      case 'Served':
-        return (
-          <Button size="sm" onClick={() => onUpdateStatus(order.id, 'Completed')} className="w-full text-xs bg-blue-500 hover:bg-blue-600 text-white">
-            <PackageCheck className="mr-1 h-3 w-3" /> Mark as Completed
+          <Button 
+            size="sm" 
+            onClick={() => onUpdateStatus(order.id, 'Completed')} 
+            className="w-full text-xs bg-green-500 hover:bg-green-600 text-white"
+          >
+            <CheckCircle className="mr-1 h-3 w-3" /> Mark as Completed
           </Button>
         );
       case 'Completed':
-      case 'Cancelled':
         if (onDismiss) {
           return (
             <Button
@@ -70,19 +48,7 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
   };
 
   return (
-    <Card className={cn("shadow-md transition-all duration-300 ease-in-out transform hover:scale-[1.01]", cardBorderColor, {
-      'bg-green-50 animate-pulse-once': order.status === 'Ready', 
-    })}>
-      <style jsx>{`
-        @keyframes pulse-once {
-          0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } /* teal-500 */
-          70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-          100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-        .animate-pulse-once {
-          animation: pulse-once 1.5s ease-out;
-        }
-      `}</style>
+    <Card className={cn("shadow-md transition-all duration-300 ease-in-out transform hover:scale-[1.01]", cardBorderColor)}>
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start gap-2">
           <div>

@@ -1,4 +1,5 @@
-export type OrderStatus = 'Pending' | 'Preparing' | 'Ready' | 'Served' | 'Completed' | 'Cancelled';
+
+export type OrderStatus = 'Pending' | 'Completed';
 
 export interface Guest {
   id: string;
