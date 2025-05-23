@@ -1,15 +1,11 @@
+import type { Order } from "@/lib/types";
 
-import type { OrderItem } from '@/lib/types';
-
-interface OrderItemDisplayProps {
-  item: OrderItem;
-}
-
-export default function OrderItemDisplay({ item }: OrderItemDisplayProps) {
+export default function OrderItemDisplay({ order }: { order: Order }) {
   return (
     <div className="py-1 text-sm">
-      <span className="font-medium">{item.quantity}x {item.name}</span>
-      {/* Notes display removed */}
+      <span className="font-medium">
+        {order.quantity}x {order.name}
+      </span>
     </div>
   );
 }

@@ -1,14 +1,20 @@
+"use client";
 
-'use client';
-
-import type { Order } from '@/lib/types'; // Guest type import removed
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import type { Order } from "@/lib/types"; // Guest type import removed
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
 // Avatar and UserCircle imports might be removed if no longer used for guest display
-import OrderStatusBadge from '@/app/components/shared/OrderStatusBadge';
-import OrderItemDisplay from '@/app/components/shared/OrderItemDisplay';
-import CreateOrderDialog from './CreateOrderDialog';
-import { ShoppingBag, Clock, CheckCircle, UserCircle } from 'lucide-react'; // UserCircle kept for "Order for Tab"
-import { Button } from '@/components/ui/button';
+import OrderStatusBadge from "@/app/components/shared/OrderStatusBadge";
+import OrderItemDisplay from "@/app/components/shared/OrderItemDisplay";
+import CreateOrderDialog from "./CreateOrderDialog";
+import { ShoppingBag, Clock, CheckCircle, UserCircle } from "lucide-react"; // UserCircle kept for "Order for Tab"
+import { Button } from "@/components/ui/button";
 
 interface OrderListForTabProps {
   tabId: string;
@@ -16,10 +22,17 @@ interface OrderListForTabProps {
   orders: Order[];
   // guests prop removed
   onCreateOrder: (newOrder: Order) => void;
-  onUpdateOrderStatus: (orderId: string, status: Order['status']) => void;
+  onUpdateOrderStatus: (orderId: string, status: Order["done"]) => void;
 }
 
-export default function OrderListForTab({ tabId, tabName, orders, onCreateOrder, onUpdateOrderStatus }: OrderListForTabProps) {
+export default function OrderListForTab({
+  tabId,
+  tabName,
+  orders,
+  onCreateOrder,
+  onUpdateOrderStatus,
+}: OrderListForTabProps) {
+  console.log({ orders });
   const sortedOrders = [...orders].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
@@ -31,11 +44,11 @@ export default function OrderListForTab({ tabId, tabName, orders, onCreateOrder,
           </CardTitle>
           <CardDescription>Manage orders for this tab.</CardDescription>
         </div>
-        <CreateOrderDialog 
-          tabId={tabId} 
-          tabName={tabName} 
+        <CreateOrderDialog
+          tabId={tabId}
+          tabName={tabName}
           // guests prop removed
-          onCreateOrder={onCreateOrder} 
+          onCreateOrder={onCreateOrder}
         />
       </CardHeader>
       <CardContent>
@@ -46,38 +59,31 @@ export default function OrderListForTab({ tabId, tabName, orders, onCreateOrder,
                 <CardHeader className="pb-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      {/* Simplified order display, no specific guest */}
-                      <div className="flex items-center text-sm font-medium">
-                        <UserCircle className="h-5 w-5 mr-2 text-muted-foreground" />
-                        Order for Tab: {order.tabName}
+                      <div className="text-xs text-muted-foreground flex items-center">
+                        <Clock className="h-3 w-3 mr-1" />
+                        {new Date(order.createdAt).toLocaleTimeString()}
                       </div>
-                       <div className="text-xs text-muted-foreground flex items-center mt-1">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {new Date(order.createdAt).toLocaleTimeString()}
-                        </div>
                     </div>
-                    <OrderStatusBadge status={order.status} />
+                    <OrderStatusBadge status={order.done} />
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0 pb-2">
                   <div className="pl-2 border-l-2 border-border ml-2">
-                    {order.items.map(item => (
-                      <OrderItemDisplay key={item.id} item={item} />
-                    ))}
+                    <OrderItemDisplay order={order} />
                   </div>
                 </CardContent>
-                { order.status === 'Pending' &&
+                {!order.done && (
                   <CardFooter className="pt-0 pb-2">
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
-                      onClick={() => onUpdateOrderStatus(order.id, 'Completed')}
+                      onClick={() => onUpdateOrderStatus(order.id, true)}
                       className="text-xs"
                     >
                       <CheckCircle className="mr-1 h-3 w-3" /> Mark as Completed
                     </Button>
                   </CardFooter>
-                }
+                )}
               </Card>
             ))}
           </div>

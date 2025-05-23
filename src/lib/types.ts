@@ -1,5 +1,3 @@
-export type OrderStatus = "Pending" | "Completed";
-
 export interface OrderItem {
   id: string;
   itemId: string; // e.g., 'lager-beer', 'merlot-red-wine'
@@ -10,10 +8,8 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
-  tabId: string;
-  tabName: string; // Denormalized
   items: OrderItem[];
-  status: OrderStatus;
+  done: boolean;
   createdAt: number; // Unix timestamp
   updatedAt: number; // Unix timestamp
 }
@@ -23,6 +19,7 @@ export interface Tab {
   name: string;
   guestCount?: number;
   createdAt: number;
+  orders: Order[];
 }
 
 export interface MenuItem {
