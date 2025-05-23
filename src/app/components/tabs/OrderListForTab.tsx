@@ -32,7 +32,6 @@ export default function OrderListForTab({
   onCreateOrder,
   onUpdateOrderStatus,
 }: OrderListForTabProps) {
-  console.log({ orders });
   const sortedOrders = [...orders].sort((a, b) => b.createdAt - a.createdAt);
 
   return (

@@ -55,6 +55,7 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
         name: tabName.trim(),
         guestCount: count > 0 ? count : 1,
         createdAt: Date.now(),
+        totalPrice: count * 1000,
       });
       // Do not call onCreateTab here; Firestore's onSnapshot will update the UI in real time
       toast({
