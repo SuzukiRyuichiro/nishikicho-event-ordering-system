@@ -2,6 +2,8 @@
 'use client';
 
 import { useState } from 'react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -28,7 +30,7 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
   const [guestCount, setGuestCount] = useState<string>('1');
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!tabName.trim()) {
       toast({
@@ -41,7 +43,7 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
 
     const count = parseInt(guestCount, 10);
     if (isNaN(count) || count < 0) {
-       toast({
+      toast({
         title: 'Error',
         description: 'Number of guests must be a valid positive number.',
         variant: 'destructive',
@@ -49,20 +51,27 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
       return;
     }
 
-    const newTab: Tab = {
-      id: Date.now().toString(), // Simple ID generation for mock
-      name: tabName.trim(),
-      guestCount: count > 0 ? count : undefined, // Store count if positive, else undefined
-      createdAt: Date.now(),
-    };
-    onCreateTab(newTab);
-    toast({
-      title: 'Success',
-      description: `Tab "${newTab.name}" created.`,
-    });
-    setTabName('');
-    setGuestCount('1');
-    setIsOpen(false);
+    try {
+      const docRef = await addDoc(collection(db, 'tabs'), {
+        name: tabName.trim(),
+        guestCount: count > 0 ? count : 1,
+        createdAt: Date.now(),
+      });
+      // Do not call onCreateTab here; Firestore's onSnapshot will update the UI in real time
+      toast({
+        title: 'Success',
+        description: `Tab "${tabName.trim()}" created.`,
+      });
+      setTabName('');
+      setGuestCount('1');
+      setIsOpen(false);
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to create tab. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (

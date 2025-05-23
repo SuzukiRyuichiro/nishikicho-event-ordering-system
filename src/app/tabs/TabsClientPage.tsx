@@ -1,27 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { collection, getDocs, onSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import type { Tab } from '@/lib/types';
 import TabCard from '@/app/components/tabs/TabCard';
 import CreateTabDialog from '@/app/components/tabs/CreateTabDialog';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 
-// Mock data - in a real app, this would come from an API
-const initialTabs: Tab[] = [
-  { id: '1', name: 'John Doe', guestCount: 2, createdAt: new Date('2024-07-20T10:00:00Z').getTime() },
-  { id: '2', name: 'Yasuda LLC', guestCount: 5, createdAt: new Date('2024-07-20T10:05:00Z').getTime() },
-  { id: '3', name: 'VIP Guest', guestCount: 1, createdAt: new Date('2024-07-20T10:10:00Z').getTime() },
-  { id: '4', name: 'Walk-in Customer', createdAt: new Date('2024-07-20T10:12:00Z').getTime() }, // Example with no guest count
-];
-
 export default function TabsClientPage() {
-  const [tabs, setTabs] = useState<Tab[]>(initialTabs);
+  const [tabs, setTabs] = useState<Tab[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [mounted, setMounted] = useState(false);
 
+
   useEffect(() => {
     setMounted(true); // Avoid hydration issues with localStorage or initial data
+    // Listen to Firestore tabs collection
+    const unsubscribe = onSnapshot(collection(db, 'tabs'), (snapshot: QuerySnapshot<DocumentData>) => {
+      const tabsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setTabs(tabsData as Tab[]);
+    });
+    return () => unsubscribe();
   }, []);
 
 

@@ -18,19 +18,19 @@ const MOCK_TABS: Tab[] = [
 ];
 
 const MOCK_ORDERS: Order[] = [
-  { 
-    id: 'o1', tabId: '1', tabName: 'John Doe', 
-    items: [{ id: 'oi1', itemId:'lager-beer', name: 'Lager Beer', quantity: 2 }, {id: 'oi2', itemId:'french-fries', name: 'French Fries', quantity: 1}], 
-    status: 'Pending', createdAt: Date.now() - 100000, updatedAt: Date.now() - 100000 
+  {
+    id: 'o1', tabId: '1', tabName: 'John Doe',
+    items: [{ id: 'oi1', itemId:'lager-beer', name: 'Lager Beer', quantity: 2 }, {id: 'oi2', itemId:'french-fries', name: 'French Fries', quantity: 1}],
+    status: 'Pending', createdAt: Date.now() - 100000, updatedAt: Date.now() - 100000
   },
-  { 
-    id: 'o2', tabId: '1', tabName: 'John Doe', 
-    items: [{ id: 'oi3', itemId:'merlot-red-wine', name: 'Merlot (Red Wine)', quantity: 1 }], 
+  {
+    id: 'o2', tabId: '1', tabName: 'John Doe',
+    items: [{ id: 'oi3', itemId:'merlot-red-wine', name: 'Merlot (Red Wine)', quantity: 1 }],
     status: 'Pending', createdAt: Date.now() - 50000, updatedAt: Date.now() - 50000
   },
-  { 
+  {
     id: 'o3', tabId: '2', tabName: 'Yasuda LLC',
-    items: [{ id: 'oi4', itemId:'gin', name: 'Gin', quantity: 1 }], 
+    items: [{ id: 'oi4', itemId:'gin', name: 'Gin', quantity: 1 }],
     status: 'Completed', createdAt: Date.now() - 20000, updatedAt: Date.now() - 10000
   },
 ];
@@ -66,8 +66,8 @@ export default function TabDetailsClientPage({ tabId }: TabDetailsClientPageProp
   };
 
   const handleUpdateOrderStatus = (orderId: string, status: Order['status']) => {
-    setOrders(prevOrders => 
-      prevOrders.map(order => 
+    setOrders(prevOrders =>
+      prevOrders.map(order =>
         order.id === orderId ? { ...order, status, updatedAt: Date.now() } : order
       )
     );
@@ -123,12 +123,12 @@ export default function TabDetailsClientPage({ tabId }: TabDetailsClientPageProp
           </CardDescription>
         </CardHeader>
       </Card>
-      
+
       <div className="mt-6">
-        <OrderListForTab 
-          tabId={tab.id} 
+        <OrderListForTab
+          tabId={tab.id}
           tabName={tab.name}
-          orders={orders} 
+          orders={orders}
           onCreateOrder={handleCreateOrder}
           onUpdateOrderStatus={handleUpdateOrderStatus}
         />

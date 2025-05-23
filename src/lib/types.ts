@@ -1,5 +1,4 @@
-
-export type OrderStatus = 'Pending' | 'Completed';
+export type OrderStatus = "Pending" | "Completed";
 
 export interface OrderItem {
   id: string;
@@ -20,10 +19,10 @@ export interface Order {
 }
 
 export interface Tab {
-  id:string;
-  name: string; // Customer or Group Name
-  guestCount?: number; // Optional number of guests
-  createdAt: number; // Unix timestamp
+  id: string;
+  name: string;
+  guestCount?: number;
+  createdAt: number;
 }
 
 export interface MenuItem {
@@ -35,16 +34,20 @@ export interface MenuItem {
 // Default menu items if nothing is found in localStorage.
 // IDs should be simple slugs.
 export const DEFAULT_MENU_ITEMS: MenuItem[] = [
-  { id: 'lager-beer', name: 'Lager Beer', category: 'Beer' },
-  { id: 'ipa-beer', name: 'IPA Beer', category: 'Beer' }, // Changed ID and name for consistency
-  { id: 'merlot-red-wine', name: 'Merlot (Red Wine)', category: 'Wine' },
-  { id: 'chardonnay-white-wine', name: 'Chardonnay (White Wine)', category: 'Wine' },
-  { id: 'vodka', name: 'Vodka', category: 'Spirit' },
-  { id: 'gin', name: 'Gin', category: 'Spirit' },
-  { id: 'coca-cola', name: 'Coca-Cola', category: 'Soft Drink' },
-  { id: 'apple-juice', name: 'Apple Juice', category: 'Soft Drink' },
-  { id: 'french-fries', name: 'French Fries', category: 'Food' }, // Kept food for example, can be removed if only beverages
-  { id: 'classic-burger', name: 'Classic Burger', category: 'Food' }, // Kept food for example
+  { id: "lager-beer", name: "Lager Beer", category: "Beer" },
+  { id: "ipa-beer", name: "IPA Beer", category: "Beer" }, // Changed ID and name for consistency
+  { id: "merlot-red-wine", name: "Merlot (Red Wine)", category: "Wine" },
+  {
+    id: "chardonnay-white-wine",
+    name: "Chardonnay (White Wine)",
+    category: "Wine",
+  },
+  { id: "vodka", name: "Vodka", category: "Spirit" },
+  { id: "gin", name: "Gin", category: "Spirit" },
+  { id: "coca-cola", name: "Coca-Cola", category: "Soft Drink" },
+  { id: "apple-juice", name: "Apple Juice", category: "Soft Drink" },
+  { id: "french-fries", name: "French Fries", category: "Food" }, // Kept food for example, can be removed if only beverages
+  { id: "classic-burger", name: "Classic Burger", category: "Food" }, // Kept food for example
 ];
 
-export const LOCAL_STORAGE_BEVERAGES_KEY = 'eventBeverageList';
+export const LOCAL_STORAGE_BEVERAGES_KEY = "eventBeverageList";
