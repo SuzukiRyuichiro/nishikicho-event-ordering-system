@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -29,7 +28,7 @@ export default function BeveragesClientPage() {
       } catch (error) {
         console.error('Failed to parse stored beverages:', error);
         setBeveragesText(DEFAULT_MENU_ITEMS.map(b => b.name).join('\n'));
-         toast({
+        toast({
           title: '警告',
           description: 'カスタムドリンクの読み込みに失敗したため、デフォルトを読み込みました。',
           variant: 'destructive',
