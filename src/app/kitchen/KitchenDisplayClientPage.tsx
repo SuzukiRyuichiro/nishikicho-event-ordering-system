@@ -57,7 +57,6 @@ export default function KitchenDisplayClientPage() {
         if (order) {
           const orderRef = doc(db, "customers", order.customerId, "orders", orderId);
           await updateDoc(orderRef, {
-            done: true,
             status: 'Completed',
             updatedAt: Date.now(),
           });
@@ -96,7 +95,7 @@ export default function KitchenDisplayClientPage() {
 
   const pendingOrdersSorted = useMemo(() => {
     return orders
-      .filter(order => !order.done)
+      .filter(order => order.status !== "Completed")
       .sort((a, b) => a.createdAt - b.createdAt); // Oldest pending first
   }, [orders]);
 

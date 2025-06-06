@@ -87,18 +87,17 @@ export default function CustomerDetailsClientPage({
     console.log("Order created:", newOrder);
   };
 
-  const handleUpdateOrderStatus = async (orderId: string, done: boolean) => {
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
       const orderRef = doc(db, "customers", customerId, "orders", orderId);
       await updateDoc(orderRef, {
-        done,
-        status: done ? "Completed" : "Pending",
+        status: newStatus,
         updatedAt: Date.now(),
       });
 
       toast({
         title: "注文ステータスを更新しました",
-        description: done ? "注文を完了にしました。" : "注文を未完了にしました。",
+        description: newStatus === "Completed" ? "注文を完了にしました。" : `注文を${newStatus}にしました。`,
       });
     } catch (error) {
       console.error("Error updating order status:", error);

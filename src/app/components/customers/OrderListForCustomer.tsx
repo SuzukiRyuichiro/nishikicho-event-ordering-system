@@ -22,7 +22,7 @@ interface OrderListForCustomerProps {
   orders: Order[];
   // guests prop removed
   onCreateOrder: (newOrder: Order) => void;
-  onUpdateOrderStatus: (orderId: string, done: boolean) => void;
+  onUpdateOrderStatus: (orderId: string, newStatus: string) => void;
 }
 
 export default function OrderListForCustomer({
@@ -62,7 +62,7 @@ export default function OrderListForCustomer({
                         {new Date(order.createdAt).toLocaleTimeString()}
                       </div>
                     </div>
-                    <OrderStatusBadge status={order.done} />
+                    <OrderStatusBadge status={order.status || "unknown"} />
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0 pb-2">
@@ -72,12 +72,12 @@ export default function OrderListForCustomer({
                     ))}
                   </div>
                 </CardContent>
-                {!order.done && (
+                {order.status !== "Completed" && (
                   <CardFooter className="pt-0 pb-2">
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => onUpdateOrderStatus(order.id, true)}
+                      onClick={() => onUpdateOrderStatus(order.id, "Completed")}
                       className="text-xs"
                     >
                       <CheckCircle className="mr-1 h-3 w-3" /> 完了にする

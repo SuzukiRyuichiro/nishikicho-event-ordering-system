@@ -11,8 +11,7 @@ export interface Order {
   customerId: string; // Required reference to customer
   customerName: string; // Denormalized for easy display
   items: OrderItem[];
-  done: boolean;
-  status?: string; // For kitchen display compatibility
+  status: string; // Order status: "Pending", "Completed", "Cancelled", etc.
   createdAt: number; // Unix timestamp
   updatedAt: number; // Unix timestamp
 }

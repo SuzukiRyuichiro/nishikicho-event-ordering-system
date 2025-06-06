@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { collection, addDoc, doc, updateDoc, increment } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+  increment,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
@@ -141,7 +147,6 @@ export default function CreateOrderDialog({
           name: item.name,
           quantity: item.quantity,
         })),
-        done: false,
         status: "Pending",
         createdAt: Date.now(),
         updatedAt: Date.now(),
@@ -156,7 +161,7 @@ export default function CreateOrderDialog({
       // Update customer's order count
       const customerRef = doc(db, "customers", customerId);
       await updateDoc(customerRef, {
-        orderCount: increment(1)
+        orderCount: increment(1),
       });
 
       // Create order object with Firestore-generated ID
