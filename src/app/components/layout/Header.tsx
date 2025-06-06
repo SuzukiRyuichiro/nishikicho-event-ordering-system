@@ -17,8 +17,8 @@ export default function Header() {
           <NavItem href="/kitchen" icon={<Martini className="h-4 w-4 sm:h-5 sm:w-5" />}>
             バー
           </NavItem>
-          <NavItem href="/beverages" icon={<GlassWater className="h-4 w-4 sm:h-5 sm:w-5" />}>
-            飲み物登録
+          <NavItem href="/menu" icon={<GlassWater className="h-4 w-4 sm:h-5 sm:w-5" />}>
+            飲み物管理
           </NavItem>
         </nav>
       </div>

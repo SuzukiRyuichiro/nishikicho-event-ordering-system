@@ -58,7 +58,11 @@ export default function BeveragesClientPage() {
     const newBeverageList: MenuItem[] = beverageNames.map(name => ({
       id: slugify(name),
       name: name,
-      category: 'Beverage', // Default category for dynamically added items
+      price: 500, // Default price
+      type: 'non-alcoholic' as const, // Default to non-alcoholic
+      archived: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     }));
 
     localStorage.setItem(LOCAL_STORAGE_BEVERAGES_KEY, JSON.stringify(newBeverageList));

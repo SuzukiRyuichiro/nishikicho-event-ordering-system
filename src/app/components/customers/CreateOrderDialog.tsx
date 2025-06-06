@@ -7,6 +7,7 @@ import {
   doc,
   updateDoc,
   increment,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Trash2, XCircle } from "lucide-react";
 import type { Order, OrderItem, MenuItem } from "@/lib/types";
-import { DEFAULT_MENU_ITEMS, LOCAL_STORAGE_BEVERAGES_KEY } from "@/lib/types";
+import { DEFAULT_MENU_ITEMS } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
@@ -51,29 +52,39 @@ export default function CreateOrderDialog({
   const { toast } = useToast();
 
   useEffect(() => {
+    // Set up real-time listener for menu items
+    const unsubscribe = onSnapshot(
+      collection(db, "menuItems"),
+      (snapshot) => {
+        const items = snapshot.docs.map(
+          (doc) =>
+            ({
+              id: doc.id,
+              ...doc.data(),
+            } as MenuItem)
+        );
+        // Filter out archived items for ordering
+        const activeItems = items.filter((item) => !item.archived);
+        // Sort by name
+        activeItems.sort((a, b) => a.name.localeCompare(b.name));
+        setAvailableBeverages(
+          activeItems.length > 0 ? activeItems : DEFAULT_MENU_ITEMS
+        );
+      },
+      (error) => {
+        console.error("Error fetching menu items:", error);
+        // Fallback to default items on error
+        setAvailableBeverages(DEFAULT_MENU_ITEMS);
+      }
+    );
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
     if (isOpen) {
       // Reset form when dialog opens
       setCurrentOrderItems([]);
-      // Load beverages from localStorage or use defaults
-      const storedBeverages = localStorage.getItem(LOCAL_STORAGE_BEVERAGES_KEY);
-      if (storedBeverages) {
-        try {
-          const parsedBeverages: MenuItem[] = JSON.parse(storedBeverages);
-          if (parsedBeverages.length > 0) {
-            setAvailableBeverages(parsedBeverages);
-          } else {
-            setAvailableBeverages(DEFAULT_MENU_ITEMS); // Fallback if stored is empty array
-          }
-        } catch (error) {
-          console.error(
-            "Failed to parse stored beverages for order dialog:",
-            error
-          );
-          setAvailableBeverages(DEFAULT_MENU_ITEMS); // Fallback on error
-        }
-      } else {
-        setAvailableBeverages(DEFAULT_MENU_ITEMS); // Fallback if nothing in local storage
-      }
     }
   }, [isOpen]);
 
@@ -220,9 +231,16 @@ export default function CreateOrderDialog({
                     onClick={() => handleBeverageClick(beverage)}
                   >
                     <span className="text-sm font-medium">{beverage.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {beverage.category}
-                    </span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-xs font-medium">
+                        ¥{beverage.price}
+                      </span>
+                      {beverage.type === "alcoholic" && (
+                        <span className="text-xs bg-red-100 text-red-700 px-1 rounded">
+                          アルコール
+                        </span>
+                      )}
+                    </div>
                   </Button>
                 ))}
               </div>
