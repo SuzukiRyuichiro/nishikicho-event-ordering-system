@@ -16,7 +16,7 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FeatureLink
-              href="/tabs"
+              href="/customers"
               icon={<Users className="h-8 w-8 text-accent" />}
               title="お客さん管理"
               description="お客さんの伝票を作成、表示、管理します。お客さんを追加し、注文を登録できます。"

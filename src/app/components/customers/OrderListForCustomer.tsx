@@ -16,22 +16,22 @@ import CreateOrderDialog from "./CreateOrderDialog";
 import { ShoppingBag, Clock, CheckCircle, UserCircle } from "lucide-react"; // UserCircle kept for "Order for Tab"
 import { Button } from "@/components/ui/button";
 
-interface OrderListForTabProps {
-  tabId: string;
-  tabName: string;
+interface OrderListForCustomerProps {
+  customerId: string;
+  customerName: string;
   orders: Order[];
   // guests prop removed
   onCreateOrder: (newOrder: Order) => void;
   onUpdateOrderStatus: (orderId: string, status: Order["done"]) => void;
 }
 
-export default function OrderListForTab({
-  tabId,
-  tabName,
+export default function OrderListForCustomer({
+  customerId,
+  customerName,
   orders,
   onCreateOrder,
   onUpdateOrderStatus,
-}: OrderListForTabProps) {
+}: OrderListForCustomerProps) {
   const sortedOrders = [...orders].sort((a, b) => b.createdAt - a.createdAt);
 
   return (
@@ -41,11 +41,11 @@ export default function OrderListForTab({
           <CardTitle className="text-lg flex items-center">
             <ShoppingBag className="mr-2 h-5 w-5 text-primary" /> Orders
           </CardTitle>
-          <CardDescription>Manage orders for this tab.</CardDescription>
+          <CardDescription>Manage orders for this customer.</CardDescription>
         </div>
         <CreateOrderDialog
-          tabId={tabId}
-          tabName={tabName}
+          customerId={customerId}
+          customerName={customerName}
           // guests prop removed
           onCreateOrder={onCreateOrder}
         />
@@ -68,7 +68,9 @@ export default function OrderListForTab({
                 </CardHeader>
                 <CardContent className="pt-0 pb-2">
                   <div className="pl-2 border-l-2 border-border ml-2">
-                    <OrderItemDisplay order={order} />
+                    {order.items.map((item) => (
+                      <OrderItemDisplay key={item.id} item={item} />
+                    ))}
                   </div>
                 </CardContent>
                 {!order.done && (
@@ -88,7 +90,7 @@ export default function OrderListForTab({
           </div>
         ) : (
           <p className="text-sm text-muted-foreground text-center py-4">
-            No orders placed for this tab yet.
+            No orders placed for this customer yet.
           </p>
         )}
       </CardContent>

@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 
 interface KitchenOrderCardProps {
   order: Order;
-  onUpdateStatus: (orderId: string, newStatus: Order['status']) => void;
+  onUpdateStatus: (orderId: string, newStatus: string | undefined) => void;
   onDismiss?: (orderId: string) => void;
 }
 
@@ -24,7 +24,7 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
             size="sm" 
             onClick={() => onUpdateStatus(order.id, 'Completed')} 
             className="w-full text-xs bg-green-500 hover:bg-green-600 text-white"
-            aria-label={`Mark order for tab ${order.tabName} as Completed`}
+            aria-label={`Mark order for customer ${order.customerName} as Completed`}
           >
             <CheckCircle className="mr-1 h-3 w-3" /> Mark as Completed
           </Button>
@@ -37,7 +37,7 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
               size="sm"
               onClick={() => onDismiss(order.id)}
               className="w-full text-xs"
-              aria-label={`Dismiss completed order for tab ${order.tabName}`}
+              aria-label={`Dismiss completed order for customer ${order.customerName}`}
             >
               <Trash2 className="mr-1 h-3 w-3" /> Dismiss
             </Button>
@@ -55,10 +55,10 @@ export default function KitchenOrderCard({ order, onUpdateStatus, onDismiss }: K
         <div className="flex justify-between items-start gap-2">
           <div>
             <CardTitle className="text-lg text-primary flex items-center">
-              <Hash className="h-4 w-4 mr-1 text-muted-foreground" /> Tab: {order.tabName}
+              <Hash className="h-4 w-4 mr-1 text-muted-foreground" /> Customer: {order.customerName}
             </CardTitle>
           </div>
-          <OrderStatusBadge status={order.status} className="text-xs whitespace-nowrap" />
+          <OrderStatusBadge status={!order.done} className="text-xs whitespace-nowrap" />
         </div>
         <div className="text-xs text-muted-foreground flex items-center mt-1">
           <Clock className="h-3 w-3 mr-1" />

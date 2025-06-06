@@ -11,7 +11,7 @@ export default function Header() {
           錦町地域交流会会計アプリ
         </Link>
         <nav className="flex items-center space-x-1 sm:space-x-2">
-          <NavItem href="/tabs" icon={<Users className="h-4 w-4 sm:h-5 sm:w-5" />}>
+          <NavItem href="/customers" icon={<Users className="h-4 w-4 sm:h-5 sm:w-5" />}>
             お客さん
           </NavItem>
           <NavItem href="/kitchen" icon={<Martini className="h-4 w-4 sm:h-5 sm:w-5" />}>

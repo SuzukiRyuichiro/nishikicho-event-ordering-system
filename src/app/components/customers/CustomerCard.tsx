@@ -1,25 +1,25 @@
 
 import Link from 'next/link';
-import type { Tab } from '@/lib/types';
+import type { Customer } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, ShoppingBag, ArrowRight, CalendarDays } from 'lucide-react';
 
-interface TabCardProps {
-  tab: Tab;
+interface CustomerCardProps {
+  customer: Customer;
   orderCount: number; // Keep order count as it might be derived elsewhere or from actual orders
 }
 
-export default function TabCard({ tab, orderCount }: TabCardProps) {
-  const guestCount = tab.guestCount ?? 0;
+export default function CustomerCard({ customer, orderCount }: CustomerCardProps) {
+  const guestCount = customer.guestCount ?? 0;
 
   return (
     <Card className="shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
       <CardHeader>
-        <CardTitle className="text-primary text-xl">{tab.name}</CardTitle>
+        <CardTitle className="text-primary text-xl">{customer.name}</CardTitle>
         <div className="text-xs text-muted-foreground flex items-center">
           <CalendarDays className="h-3 w-3 mr-1" />
-          Created: {new Date(tab.createdAt).toLocaleDateString()}
+          Created: {new Date(customer.createdAt).toLocaleDateString()}
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
@@ -36,8 +36,8 @@ export default function TabCard({ tab, orderCount }: TabCardProps) {
       </CardContent>
       <CardFooter>
         <Button asChild variant="outline" className="w-full group">
-          <Link href={`/tabs/${tab.id}`}>
-            View Tab
+          <Link href={`/customers/${customer.id}`}>
+            View Customer
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Button>

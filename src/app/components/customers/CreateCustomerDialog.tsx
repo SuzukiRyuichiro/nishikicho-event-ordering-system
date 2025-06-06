@@ -16,22 +16,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PlusCircle } from "lucide-react";
-import type { Tab } from "@/lib/types";
+import type { Customer } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
-interface CreateTabDialogProps {
-  onCreateTab: (newTab: Tab) => void;
+interface CreateCustomerDialogProps {
+  onCreateCustomer: (newCustomer: Customer) => void;
 }
 
-export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
+export default function CreateCustomerDialog({ onCreateCustomer }: CreateCustomerDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [tabName, setTabName] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const [guestCount, setGuestCount] = useState<string>("1");
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tabName.trim()) {
+    if (!customerName.trim()) {
       toast({
         title: "Error",
         description: "Customer/Group Name cannot be empty.",
@@ -51,24 +51,24 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
     }
 
     try {
-      const docRef = await addDoc(collection(db, "tabs"), {
-        name: tabName.trim(),
+      const docRef = await addDoc(collection(db, "customers"), {
+        name: customerName.trim(),
         guestCount: count > 0 ? count : 1,
         createdAt: Date.now(),
         totalPrice: count * 1000,
       });
-      // Do not call onCreateTab here; Firestore's onSnapshot will update the UI in real time
+      // Do not call onCreateCustomer here; Firestore's onSnapshot will update the UI in real time
       toast({
         title: "Success",
-        description: `Tab "${tabName.trim()}" created.`,
+        description: `Customer "${customerName.trim()}" created.`,
       });
-      setTabName("");
+      setCustomerName("");
       setGuestCount("1");
       setIsOpen(false);
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to create tab. Please try again.",
+        description: "Failed to create customer. Please try again.",
         variant: "destructive",
       });
     }
@@ -91,13 +91,13 @@ export default function CreateTabDialog({ onCreateTab }: CreateTabDialogProps) {
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="tabName" className="text-right">
+              <Label htmlFor="customerName" className="text-right">
                 名前
               </Label>
               <Input
-                id="tabName"
-                value={tabName}
-                onChange={(e) => setTabName(e.target.value)}
+                id="customerName"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
                 className="col-span-3"
                 placeholder="e.g., 鈴木龍一郎 / 安田不動産"
                 required

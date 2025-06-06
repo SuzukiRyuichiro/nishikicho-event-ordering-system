@@ -20,8 +20,8 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 interface CreateOrderDialogProps {
-  tabId: string;
-  tabName: string;
+  customerId: string;
+  customerName: string;
   onCreateOrder: (newOrder: Order) => void;
 }
 
@@ -32,8 +32,8 @@ const slugify = (text: string) =>
     .replace(/[^a-z0-9-]/g, "");
 
 export default function CreateOrderDialog({
-  tabId,
-  tabName,
+  customerId,
+  customerName,
   onCreateOrder,
 }: CreateOrderDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -130,8 +130,8 @@ export default function CreateOrderDialog({
 
     const newOrder: Order = {
       id: Date.now().toString(), // Mock ID
-      tabId,
-      tabName,
+      customerId,
+      customerName,
       items: currentOrderItems.map((item) => ({
         // Ensure no extra fields are passed
         id: item.id, // This is a temp client-side ID, server should generate real one
@@ -139,6 +139,7 @@ export default function CreateOrderDialog({
         name: item.name,
         quantity: item.quantity,
       })),
+      done: false,
       status: "Pending",
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -147,7 +148,7 @@ export default function CreateOrderDialog({
     onCreateOrder(newOrder);
     toast({
       title: "Success",
-      description: `Order created for ${tabName}.`,
+      description: `Order created for ${customerName}.`,
     });
     setIsOpen(false);
   };
@@ -165,7 +166,7 @@ export default function CreateOrderDialog({
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl md:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>{tabName}に新しい注文を追加する</DialogTitle>
+          <DialogTitle>{customerName}に新しい注文を追加する</DialogTitle>
           <DialogDescription>
             追加したい飲み物をクリックしてください
           </DialogDescription>

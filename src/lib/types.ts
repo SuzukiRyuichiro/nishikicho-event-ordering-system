@@ -8,13 +8,16 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
+  customerId?: string;
+  customerName?: string;
   items: OrderItem[];
   done: boolean;
+  status?: string; // For kitchen display compatibility
   createdAt: number; // Unix timestamp
   updatedAt: number; // Unix timestamp
 }
 
-export interface Tab {
+export interface Customer {
   id: string;
   name: string;
   guestCount?: number;

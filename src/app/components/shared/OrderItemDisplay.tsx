@@ -1,10 +1,10 @@
-import type { Order } from "@/lib/types";
+import type { OrderItem } from "@/lib/types";
 
-export default function OrderItemDisplay({ order }: { order: Order }) {
+export default function OrderItemDisplay({ item }: { item: OrderItem }) {
   return (
     <div className="py-1 text-sm">
       <span className="font-medium">
-        {order.quantity}x {order.name}
+        {item.quantity}x {item.name}
       </span>
     </div>
   );
