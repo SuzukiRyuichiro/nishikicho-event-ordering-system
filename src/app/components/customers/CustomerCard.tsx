@@ -19,18 +19,18 @@ export default function CustomerCard({ customer, orderCount }: CustomerCardProps
         <CardTitle className="text-primary text-xl">{customer.name}</CardTitle>
         <div className="text-xs text-muted-foreground flex items-center">
           <CalendarDays className="h-3 w-3 mr-1" />
-          Created: {new Date(customer.createdAt).toLocaleDateString()}
+          来場: {new Date(customer.createdAt).toLocaleTimeString()}
         </div>
       </CardHeader>
       <CardContent className="flex-grow">
         <div className="space-y-2 text-sm">
           <div className="flex items-center text-muted-foreground">
             <Users className="h-4 w-4 mr-2 text-accent" />
-            <span>{guestCount} Guest{guestCount !== 1 ? 's' : ''}</span>
+            <span>{guestCount}人</span>
           </div>
           <div className="flex items-center text-muted-foreground">
             <ShoppingBag className="h-4 w-4 mr-2 text-accent" />
-            <span>{orderCount} Order{orderCount !== 1 ? 's' : ''}</span>
+            <span>注文数: {orderCount}</span>
           </div>
         </div>
       </CardContent>

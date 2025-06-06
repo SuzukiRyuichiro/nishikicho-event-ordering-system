@@ -1,38 +1,51 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { collection, getDocs, onSnapshot, QuerySnapshot, DocumentData } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import type { Customer } from '@/lib/types';
-import CustomerCard from '@/app/components/customers/CustomerCard';
-import CreateCustomerDialog from '@/app/components/customers/CreateCustomerDialog';
-import { Input } from '@/components/ui/input';
-import { Search } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  collection,
+  getDocs,
+  onSnapshot,
+  QuerySnapshot,
+  DocumentData,
+} from "firebase/firestore";
+import { db } from "@/lib/firebase";
+import type { Customer } from "@/lib/types";
+import CustomerCard from "@/app/components/customers/CustomerCard";
+import CreateCustomerDialog from "@/app/components/customers/CreateCustomerDialog";
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export default function CustomersClientPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [mounted, setMounted] = useState(false);
-
 
   useEffect(() => {
     setMounted(true); // Avoid hydration issues with localStorage or initial data
     // Listen to Firestore customers collection
-    const unsubscribe = onSnapshot(collection(db, 'customers'), (snapshot: QuerySnapshot<DocumentData>) => {
-      const customersData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setCustomers(customersData as Customer[]);
-    });
+    const unsubscribe = onSnapshot(
+      collection(db, "customers"),
+      (snapshot: QuerySnapshot<DocumentData>) => {
+        const customersData = snapshot.docs.map((doc) => {
+          return {
+            id: doc.id,
+            ...doc.data(),
+          };
+        });
+        setCustomers(customersData as Customer[]);
+      }
+    );
     return () => unsubscribe();
   }, []);
-
 
   const handleCreateCustomer = (newCustomer: Customer) => {
     setCustomers((prevCustomers) => [newCustomer, ...prevCustomers]);
   };
 
-  const filteredCustomers = customers.filter((customer) =>
-    customer.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCustomers = customers.filter((customer) => {
+    console.log({ customer });
+    return customer.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   if (!mounted) {
     return <div className="text-center py-10">伝票を読み込み中...</div>; // Or a skeleton loader
