@@ -37,7 +37,7 @@ export default function CustomerCard({ customer, orderCount }: CustomerCardProps
       <CardFooter>
         <Button asChild variant="outline" className="w-full group">
           <Link href={`/customers/${customer.id}`}>
-            View Customer
+            詳細を見る
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Button>

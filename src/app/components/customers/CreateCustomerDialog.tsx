@@ -54,6 +54,7 @@ export default function CreateCustomerDialog({ onCreateCustomer }: CreateCustome
       const docRef = await addDoc(collection(db, "customers"), {
         name: customerName.trim(),
         guestCount: count > 0 ? count : 1,
+        orderCount: 0,
         createdAt: Date.now(),
         totalPrice: count * 1000,
       });

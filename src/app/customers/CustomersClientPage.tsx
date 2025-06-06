@@ -75,8 +75,7 @@ export default function CustomersClientPage() {
             <CustomerCard
               key={customer.id}
               customer={customer}
-              // Mock order count for now.
-              orderCount={Math.floor(Math.random() * 10)} // Example
+              orderCount={customer.orderCount || 0}
             />
           ))}
         </div>

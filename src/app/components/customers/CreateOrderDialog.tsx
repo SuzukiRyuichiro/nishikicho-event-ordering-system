@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, doc, updateDoc, increment } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
@@ -153,6 +153,12 @@ export default function CreateOrderDialog({
         orderData
       );
 
+      // Update customer's order count
+      const customerRef = doc(db, "customers", customerId);
+      await updateDoc(customerRef, {
+        orderCount: increment(1)
+      });
+
       // Create order object with Firestore-generated ID
       const newOrder: Order = {
         id: docRef.id,
@@ -163,15 +169,15 @@ export default function CreateOrderDialog({
       onCreateOrder(newOrder);
 
       toast({
-        title: "注文が作成されました",
-        description: `${customerName}の注文を作成しました。`,
+        title: "注文が完了しました",
+        description: `${customerName}様の注文が完了しました。`,
       });
       setIsOpen(false);
     } catch (error) {
       console.error("Error creating order:", error);
       toast({
         title: "エラー",
-        description: "注文の作成に失敗しました。もう一度お試しください。",
+        description: "注文に失敗しました。もう一度お試しください。",
         variant: "destructive",
       });
     }
@@ -185,12 +191,12 @@ export default function CreateOrderDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <ShoppingCart className="mr-2 h-4 w-4" /> 新しい注文を作成
+          <ShoppingCart className="mr-2 h-4 w-4" /> 新しい注文を追加
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl md:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>{customerName}に新しい注文を追加する</DialogTitle>
+          <DialogTitle>{customerName}様に新しい注文を追加する</DialogTitle>
           <DialogDescription>
             追加したい飲み物をクリックしてください
           </DialogDescription>

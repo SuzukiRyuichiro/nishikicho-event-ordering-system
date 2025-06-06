@@ -39,9 +39,9 @@ export default function OrderListForCustomer({
       <CardHeader className="flex flex-row justify-between items-center">
         <div>
           <CardTitle className="text-lg flex items-center">
-            <ShoppingBag className="mr-2 h-5 w-5 text-primary" /> Orders
+            <ShoppingBag className="mr-2 h-5 w-5 text-primary" /> 注文
           </CardTitle>
-          <CardDescription>Manage orders for this customer.</CardDescription>
+          <CardDescription>{customerName}様の注文履歴</CardDescription>
         </div>
         <CreateOrderDialog
           customerId={customerId}
@@ -89,7 +89,7 @@ export default function OrderListForCustomer({
           </div>
         ) : (
           <p className="text-sm text-muted-foreground text-center py-4">
-            No orders placed for this customer yet.
+            まだ注文はありません
           </p>
         )}
       </CardContent>

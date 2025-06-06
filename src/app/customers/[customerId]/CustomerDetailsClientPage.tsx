@@ -76,7 +76,7 @@ export default function CustomerDetailsClientPage({
     );
 
     fetchCustomer();
-    
+
     // Cleanup listener on unmount
     return () => unsubscribeOrders();
   }, [customerId]);
@@ -150,11 +150,11 @@ export default function CustomerDetailsClientPage({
             {customer.name}
           </CardTitle>
           <CardDescription className="text-sm text-muted-foreground flex items-center gap-4">
-            <span>Created on: {new Date(customer.createdAt).toLocaleString()}</span>
+            <span>来場時間: {new Date(customer.createdAt).toLocaleTimeString()}</span>
             {customer.guestCount && customer.guestCount > 0 && (
               <span className="flex items-center">
                 <Users className="mr-1 h-4 w-4 text-muted-foreground" />
-                {customer.guestCount} Guest{customer.guestCount !== 1 ? "s" : ""}
+                {customer.guestCount}人
               </span>
             )}
           </CardDescription>

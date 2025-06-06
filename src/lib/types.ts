@@ -21,6 +21,7 @@ export interface Customer {
   id: string;
   name: string;
   guestCount?: number;
+  orderCount: number;
   createdAt: number;
   orders: Order[];
 }
