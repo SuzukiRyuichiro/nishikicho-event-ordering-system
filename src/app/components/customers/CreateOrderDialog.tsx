@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -118,7 +120,7 @@ export default function CreateOrderDialog({
     setCurrentOrderItems([]);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (currentOrderItems.length === 0) {
       toast({
         title: "Error",
@@ -128,29 +130,51 @@ export default function CreateOrderDialog({
       return;
     }
 
-    const newOrder: Order = {
-      id: Date.now().toString(), // Mock ID
-      customerId,
-      customerName,
-      items: currentOrderItems.map((item) => ({
-        // Ensure no extra fields are passed
-        id: item.id, // This is a temp client-side ID, server should generate real one
-        itemId: item.itemId,
-        name: item.name,
-        quantity: item.quantity,
-      })),
-      done: false,
-      status: "Pending",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
+    try {
+      // Create order data for Firestore
+      const orderData = {
+        customerId,
+        customerName,
+        items: currentOrderItems.map((item) => ({
+          id: item.id,
+          itemId: item.itemId,
+          name: item.name,
+          quantity: item.quantity,
+        })),
+        done: false,
+        status: "Pending",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      };
 
-    onCreateOrder(newOrder);
-    toast({
-      title: "Success",
-      description: `Order created for ${customerName}.`,
-    });
-    setIsOpen(false);
+      // Save to Firestore under customers/{customerId}/orders
+      const docRef = await addDoc(
+        collection(db, "customers", customerId, "orders"),
+        orderData
+      );
+
+      // Create order object with Firestore-generated ID
+      const newOrder: Order = {
+        id: docRef.id,
+        ...orderData,
+      };
+
+      // Call parent callback (for real-time UI updates)
+      onCreateOrder(newOrder);
+
+      toast({
+        title: "注文が作成されました",
+        description: `${customerName}の注文を作成しました。`,
+      });
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast({
+        title: "エラー",
+        description: "注文の作成に失敗しました。もう一度お試しください。",
+        variant: "destructive",
+      });
+    }
   };
 
   const totalItemsInOrder = useMemo(() => {
@@ -161,7 +185,7 @@ export default function CreateOrderDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button>
-          <ShoppingCart className="mr-2 h-4 w-4" /> Create New Order
+          <ShoppingCart className="mr-2 h-4 w-4" /> 新しい注文を作成
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl md:max-w-3xl max-h-[90vh] flex flex-col">

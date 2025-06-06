@@ -8,8 +8,8 @@ export interface OrderItem {
 
 export interface Order {
   id: string;
-  customerId?: string;
-  customerName?: string;
+  customerId: string; // Required reference to customer
+  customerName: string; // Denormalized for easy display
   items: OrderItem[];
   done: boolean;
   status?: string; // For kitchen display compatibility

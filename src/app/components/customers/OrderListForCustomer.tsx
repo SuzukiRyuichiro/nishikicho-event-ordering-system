@@ -22,7 +22,7 @@ interface OrderListForCustomerProps {
   orders: Order[];
   // guests prop removed
   onCreateOrder: (newOrder: Order) => void;
-  onUpdateOrderStatus: (orderId: string, status: Order["done"]) => void;
+  onUpdateOrderStatus: (orderId: string, done: boolean) => void;
 }
 
 export default function OrderListForCustomer({
@@ -46,7 +46,6 @@ export default function OrderListForCustomer({
         <CreateOrderDialog
           customerId={customerId}
           customerName={customerName}
-          // guests prop removed
           onCreateOrder={onCreateOrder}
         />
       </CardHeader>
@@ -81,7 +80,7 @@ export default function OrderListForCustomer({
                       onClick={() => onUpdateOrderStatus(order.id, true)}
                       className="text-xs"
                     >
-                      <CheckCircle className="mr-1 h-3 w-3" /> Mark as Completed
+                      <CheckCircle className="mr-1 h-3 w-3" /> 完了にする
                     </Button>
                   </CardFooter>
                 )}

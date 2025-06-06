@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
-import { doc, getDoc, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, getDocs, onSnapshot, updateDoc } from "firebase/firestore";
 
 interface CustomerDetailsClientPageProps {
   customerId: string;
@@ -54,34 +54,60 @@ export default function CustomerDetailsClientPage({
       }
     };
 
-    const fetchOrdersForCustomer = async () => {
-      const querySnapshot = await getDocs(
-        collection(db, "customers", customerId, "orders")
-      );
-      const ordersArr = querySnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() } as Order)
-      );
-      setOrders(ordersArr);
-    };
+    // Set up real-time listener for orders
+    const unsubscribeOrders = onSnapshot(
+      collection(db, "customers", customerId, "orders"),
+      (snapshot) => {
+        const ordersArr = snapshot.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() } as Order)
+        );
+        // Sort by creation time, newest first
+        ordersArr.sort((a, b) => b.createdAt - a.createdAt);
+        setOrders(ordersArr);
+      },
+      (error) => {
+        console.error("Error fetching orders:", error);
+        toast({
+          title: "エラー",
+          description: "注文の取得に失敗しました。",
+          variant: "destructive",
+        });
+      }
+    );
 
     fetchCustomer();
-    fetchOrdersForCustomer();
+    
+    // Cleanup listener on unmount
+    return () => unsubscribeOrders();
   }, [customerId]);
 
-  const handleCreateOrder = (newOrder: Order) => {};
+  const handleCreateOrder = (newOrder: Order) => {
+    // Order is already saved to Firestore in CreateOrderDialog
+    // Real-time listener will automatically update the UI
+    console.log("Order created:", newOrder);
+  };
 
-  const handleUpdateOrderStatus = (orderId: string) => {
-    toast({
-      title: "Order Updated",
-      description: `Order status changed to ${status}.`,
-    });
-    // Simulate updating this order in a shared state for KitchenDisplay
-    const currentKitchenOrders: Order[] = JSON.parse(
-      localStorage.getItem("MOCK_KITCHEN_ORDERS") || "[]"
-    );
-    const updatedKitchenOrders = currentKitchenOrders.map((o) =>
-      o.id === orderId ? { ...o, status, updatedAt: Date.now() } : o
-    );
+  const handleUpdateOrderStatus = async (orderId: string, done: boolean) => {
+    try {
+      const orderRef = doc(db, "customers", customerId, "orders", orderId);
+      await updateDoc(orderRef, {
+        done,
+        status: done ? "Completed" : "Pending",
+        updatedAt: Date.now(),
+      });
+
+      toast({
+        title: "注文ステータスを更新しました",
+        description: done ? "注文を完了にしました。" : "注文を未完了にしました。",
+      });
+    } catch (error) {
+      console.error("Error updating order status:", error);
+      toast({
+        title: "エラー",
+        description: "注文ステータスの更新に失敗しました。",
+        variant: "destructive",
+      });
+    }
   };
 
   if (isLoading) {
