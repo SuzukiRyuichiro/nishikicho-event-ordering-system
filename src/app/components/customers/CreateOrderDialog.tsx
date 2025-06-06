@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Trash2, XCircle } from "lucide-react";
+import { ShoppingCart, Trash2, XCircle, Plus } from "lucide-react";
 import type { Order, OrderItem, MenuItem } from "@/lib/types";
 import { DEFAULT_MENU_ITEMS } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -32,6 +32,7 @@ interface CreateOrderDialogProps {
   customerId: string;
   customerName: string;
   onCreateOrder: (newOrder: Order) => void;
+  variant?: "full" | "icon"; // full button with text or just icon
 }
 
 const slugify = (text: string) =>
@@ -44,6 +45,7 @@ export default function CreateOrderDialog({
   customerId,
   customerName,
   onCreateOrder,
+  variant = "full",
 }: CreateOrderDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [currentOrderItems, setCurrentOrderItems] = useState<OrderItem[]>([]);
@@ -206,9 +208,15 @@ export default function CreateOrderDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <ShoppingCart className="mr-2 h-4 w-4" /> 新しい注文を追加
-        </Button>
+        {variant === "icon" ? (
+          <Button size="icon" variant="outline" title="注文を追加">
+            <Plus className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button>
+            <ShoppingCart className="mr-2 h-4 w-4" /> 新しい注文を追加
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl md:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>

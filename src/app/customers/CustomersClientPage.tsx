@@ -9,16 +9,18 @@ import {
   DocumentData,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { Customer } from "@/lib/types";
+import type { Customer, Order } from "@/lib/types";
 import CustomerCard from "@/app/components/customers/CustomerCard";
 import CreateCustomerDialog from "@/app/components/customers/CreateCustomerDialog";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CustomersClientPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [mounted, setMounted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     setMounted(true); // Avoid hydration issues with localStorage or initial data
@@ -40,6 +42,15 @@ export default function CustomersClientPage() {
 
   const handleCreateCustomer = (newCustomer: Customer) => {
     setCustomers((prevCustomers) => [newCustomer, ...prevCustomers]);
+  };
+
+  const handleCreateOrder = (newOrder: Order) => {
+    // Order is already saved to Firestore in CreateOrderDialog
+    // Show success toast
+    toast({
+      title: "注文が完了しました",
+      description: `注文が正常に作成されました。`,
+    });
   };
 
   const filteredCustomers = customers.filter((customer) => {
@@ -76,6 +87,7 @@ export default function CustomersClientPage() {
               key={customer.id}
               customer={customer}
               orderCount={customer.orderCount || 0}
+              onCreateOrder={handleCreateOrder}
             />
           ))}
         </div>

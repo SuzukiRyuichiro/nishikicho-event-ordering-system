@@ -1,16 +1,18 @@
 
 import Link from 'next/link';
-import type { Customer } from '@/lib/types';
+import type { Customer, Order } from '@/lib/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, ShoppingBag, ArrowRight, CalendarDays } from 'lucide-react';
+import { Users, ShoppingBag, ArrowRight, CalendarDays, Plus } from 'lucide-react';
+import CreateOrderDialog from './CreateOrderDialog';
 
 interface CustomerCardProps {
   customer: Customer;
   orderCount: number; // Keep order count as it might be derived elsewhere or from actual orders
+  onCreateOrder?: (newOrder: Order) => void;
 }
 
-export default function CustomerCard({ customer, orderCount }: CustomerCardProps) {
+export default function CustomerCard({ customer, orderCount, onCreateOrder }: CustomerCardProps) {
   const guestCount = customer.guestCount ?? 0;
 
   return (
@@ -34,13 +36,21 @@ export default function CustomerCard({ customer, orderCount }: CustomerCardProps
           </div>
         </div>
       </CardContent>
-      <CardFooter>
-        <Button asChild variant="outline" className="w-full group">
+      <CardFooter className="flex gap-2">
+        <Button asChild variant="outline" className="flex-1 group">
           <Link href={`/customers/${customer.id}`}>
             詳細を見る
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </Button>
+        {onCreateOrder && (
+          <CreateOrderDialog
+            customerId={customer.id}
+            customerName={customer.name}
+            onCreateOrder={onCreateOrder}
+            variant="icon"
+          />
+        )}
       </CardFooter>
     </Card>
   );
