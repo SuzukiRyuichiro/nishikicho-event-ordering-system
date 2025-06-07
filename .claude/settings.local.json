@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(npm run typecheck:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "mcp__firebase__firebase_get_environment",
+      "mcp__firebase__firestore_list_collections",
+      "mcp__firebase__firestore_query_collection",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(firebase deploy:*)"
     ],
     "deny": []
   }
