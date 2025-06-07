@@ -76,11 +76,11 @@ export default function OrderListForCustomer({
                   <CardFooter className="pt-0 pb-2">
                     <Button
                       size="sm"
-                      variant="outline"
                       onClick={() => onUpdateOrderStatus(order.id, "Completed")}
-                      className="text-xs"
+                      className="w-full text-xs bg-green-500 hover:bg-green-600 text-white"
+                      aria-label={`Mark order for customer ${order.customerName} as Completed`}
                     >
-                      <CheckCircle className="mr-1 h-3 w-3" /> 完了にする
+                      <CheckCircle className="mr-1 h-3 w-3" /> 提供済みにする
                     </Button>
                   </CardFooter>
                 )}

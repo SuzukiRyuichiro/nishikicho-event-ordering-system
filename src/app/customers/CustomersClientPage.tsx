@@ -55,7 +55,8 @@ export default function CustomersClientPage() {
 
   const filteredCustomers = customers.filter((customer) => {
     console.log({ customer });
-    return customer.name.toLowerCase().includes(searchTerm.toLowerCase());
+    // Filter out paid customers and match search term
+    return !customer.paid && customer.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
   if (!mounted) {

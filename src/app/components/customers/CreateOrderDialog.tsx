@@ -230,7 +230,7 @@ export default function CreateOrderDialog({
           {/* Beverage Grid */}
           <div className="md:w-2/3 flex-shrink-0">
             <ScrollArea className="h-64 md:h-full pr-3 border rounded-md">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 p-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 p-2">
                 {availableBeverages.map((beverage) => (
                   <Button
                     key={beverage.id}
@@ -258,15 +258,15 @@ export default function CreateOrderDialog({
           {/* Current Order Summary */}
           <div className="md:w-1/3 flex flex-col border rounded-md p-3 bg-muted/30 shadow-inner">
             <h3 className="text-sm font-medium mb-2 flex justify-between items-center text-muted-foreground">
-              <span>Current Order</span>
+              <span>注文リスト</span>
               {totalItemsInOrder > 0 && (
-                <Badge variant="secondary">{totalItemsInOrder} item(s)</Badge>
+                <Badge variant="secondary">{totalItemsInOrder} 杯</Badge>
               )}
             </h3>
             <ScrollArea className="flex-grow h-48 md:h-auto">
               {currentOrderItems.length === 0 ? (
                 <p className="text-xs text-center text-muted-foreground py-4">
-                  No items added yet.
+                 まだ何も追加されてません
                 </p>
               ) : (
                 <ul className="space-y-1 text-xs">
@@ -298,7 +298,7 @@ export default function CreateOrderDialog({
                 onClick={handleClearOrder}
                 className="mt-3 w-full text-xs"
               >
-                <Trash2 className="mr-1 h-3 w-3" /> Clear All Items
+                <Trash2 className="mr-1 h-3 w-3" /> クリア
               </Button>
             )}
           </div>
@@ -310,14 +310,14 @@ export default function CreateOrderDialog({
             variant="outline"
             onClick={() => setIsOpen(false)}
           >
-            Cancel
+            キャンセル
           </Button>
           <Button
             type="button"
             onClick={handleSubmit}
             disabled={currentOrderItems.length === 0}
           >
-            Create Order ({totalItemsInOrder})
+            注文 ({totalItemsInOrder}杯)
           </Button>
         </DialogFooter>
       </DialogContent>

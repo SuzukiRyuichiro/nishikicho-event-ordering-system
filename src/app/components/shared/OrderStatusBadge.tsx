@@ -16,14 +16,20 @@ export default function OrderStatusBadge({
     cancelled: "bg-red-100 text-red-700 border-red-300",
   };
 
+  const statusTranslations: Record<string, string> = {
+    "Pending": "提供待ち",
+    "Completed": "提供済み", 
+    "Cancelled": "キャンセル",
+  };
+
   const normalizedStatus = status.toLowerCase();
-  const displayStatus = status || "unknown";
+  const displayStatus = statusTranslations[status] || status || "unknown";
 
   return (
     <Badge
       variant="outline"
       className={cn(
-        "capitalize transition-colors duration-300",
+        "transition-colors duration-300",
         statusStyles[normalizedStatus] ||
           "bg-gray-100 text-gray-700 border-gray-300", // Fallback
         className

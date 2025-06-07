@@ -10,6 +10,7 @@ export interface Order {
   id: string;
   customerId: string; // Required reference to customer
   customerName: string; // Denormalized for easy display
+  customerPaid?: boolean; // Denormalized payment status for kitchen filtering
   items: OrderItem[];
   status: string; // Order status: "Pending", "Completed", "Cancelled", etc.
   createdAt: number; // Unix timestamp
@@ -23,6 +24,8 @@ export interface Customer {
   orderCount: number;
   createdAt: number;
   orders: Order[];
+  paid?: boolean;
+  paidAt?: number;
 }
 
 export interface MenuItem {

@@ -39,7 +39,7 @@ export default function KitchenOrderCard({
             className="w-full text-xs bg-green-500 hover:bg-green-600 text-white"
             aria-label={`Mark order for customer ${order.customerName} as Completed`}
           >
-            <CheckCircle className="mr-1 h-3 w-3" /> Mark as Completed
+            <CheckCircle className="mr-1 h-3 w-3" />提供済みにする
           </Button>
         );
       case "Completed":

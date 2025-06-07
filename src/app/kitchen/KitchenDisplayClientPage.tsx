@@ -6,22 +6,18 @@ import { collection, collectionGroup, onSnapshot, doc, updateDoc } from 'firebas
 import { db } from '@/lib/firebase';
 import type { Order } from '@/lib/types';
 import KitchenOrderCard from '@/app/components/kitchen/KitchenOrderCard';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, XCircle } from 'lucide-react';
+import { XCircle, CircleCheck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { CircleCheck } from 'lucide-react'
 
 // Real-time orders are now fetched from Firestore
 
 export default function KitchenDisplayClientPage() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    setLastUpdated(new Date());
 
     // Set up real-time listener for all orders across all customers
     const unsubscribe = onSnapshot(
@@ -33,7 +29,6 @@ export default function KitchenDisplayClientPage() {
         // Sort by creation time, newest first
         ordersArr.sort((a, b) => b.createdAt - a.createdAt);
         setOrders(ordersArr);
-        setLastUpdated(new Date());
       },
       (error) => {
         console.error("Error fetching orders:", error);
@@ -87,15 +82,10 @@ export default function KitchenDisplayClientPage() {
     });
   };
 
-  const handleRefresh = () => {
-    toast({ title: "注文を更新中...", description: "最新データを取得しています。" });
-    setLastUpdated(new Date());
-    // Real-time listener will automatically update the data
-  };
 
   const pendingOrdersSorted = useMemo(() => {
     return orders
-      .filter(order => order.status !== "Completed")
+      .filter(order => order.status !== "Completed" && !order.customerPaid)
       .sort((a, b) => a.createdAt - b.createdAt); // Oldest pending first
   }, [orders]);
 
@@ -107,13 +97,7 @@ export default function KitchenDisplayClientPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4">
         <h1 className="text-3xl font-bold text-primary">バー</h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button variant="outline" size="sm" onClick={handleRefresh} className="h-9 text-xs">
-            <RefreshCw className="mr-2 h-3 w-3" /> 更新
-          </Button>
-        </div>
       </div>
-      {lastUpdated && <p className="text-xs text-muted-foreground text-right -mt-4">最終更新: {lastUpdated.toLocaleTimeString()}</p>}
 
       {pendingOrdersSorted.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
