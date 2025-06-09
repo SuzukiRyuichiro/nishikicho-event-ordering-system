@@ -8,7 +8,13 @@
       "mcp__firebase__firestore_query_collection",
       "Bash(grep:*)",
       "Bash(rg:*)",
-      "Bash(firebase deploy:*)"
+      "Bash(firebase deploy:*)",
+      "mcp__firebase__firebase_get_admin_sdk_config",
+      "Bash(gh auth:*)",
+      "Bash(git push:*)",
+      "mcp__github__search_code",
+      "WebFetch(domain:github.com)",
+      "Bash(python3:*)"
     ],
     "deny": []
   }
