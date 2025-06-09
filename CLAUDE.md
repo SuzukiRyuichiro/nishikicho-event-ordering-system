@@ -13,7 +13,13 @@
 
 - npm run build: Build the project
 - npm run typecheck: Run the typechecker
-- firebase deploy --only apphosting: deploying
+- firebase deploy --only apphosting: Manual deployment (GitHub Actions handles automatic deployment)
+
+# Deployment
+
+- Automatic deployment via GitHub Actions when pushing to master branch
+- Manual deployment still available using Firebase CLI
+- See DEPLOYMENT.md for GitHub Actions setup instructions
 
 # Code style
 
