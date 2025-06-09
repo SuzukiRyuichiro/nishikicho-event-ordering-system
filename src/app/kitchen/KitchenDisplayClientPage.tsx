@@ -6,15 +6,43 @@ import { collection, collectionGroup, onSnapshot, doc, updateDoc } from 'firebas
 import { db } from '@/lib/firebase';
 import type { Order } from '@/lib/types';
 import KitchenOrderCard from '@/app/components/kitchen/KitchenOrderCard';
-import { XCircle, CircleCheck } from 'lucide-react';
+import { XCircle, CircleCheck, Eye, EyeOff } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
 
 // Real-time orders are now fetched from Firestore
 
 export default function KitchenDisplayClientPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [previousOrderCount, setPreviousOrderCount] = useState<number>(0);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const [showServedOrders, setShowServedOrders] = useState(false);
   const { toast } = useToast();
   const [mounted, setMounted] = useState(false);
+
+  // Function to play notification sound
+  const playNotificationSound = () => {
+    try {
+      // Create a simple beep sound using Web Audio API
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime); // 800 Hz tone
+      oscillator.type = 'sine';
+      
+      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.3);
+    } catch (error) {
+      console.warn("Could not play notification sound:", error);
+    }
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -28,6 +56,27 @@ export default function KitchenDisplayClientPage() {
         );
         // Sort by creation time, newest first
         ordersArr.sort((a, b) => b.createdAt - a.createdAt);
+        
+        // Filter pending orders for notification check
+        const currentPendingOrders = ordersArr.filter(order => 
+          order.status !== "Completed" && !order.customerPaid
+        );
+        
+        // Play sound if there are new pending orders (only after initial load and when user is already on this page)
+        if (mounted && !isInitialLoad && currentPendingOrders.length > previousOrderCount) {
+          playNotificationSound();
+          toast({
+            title: "新しい注文",
+            description: "新しい注文が入りました！",
+          });
+        }
+        
+        // Set initial load to false after first data load
+        if (isInitialLoad) {
+          setIsInitialLoad(false);
+        }
+        
+        setPreviousOrderCount(currentPendingOrders.length);
         setOrders(ordersArr);
       },
       (error) => {
@@ -41,7 +90,7 @@ export default function KitchenDisplayClientPage() {
     );
 
     return () => unsubscribe();
-  }, [toast]);
+  }, [toast, mounted, previousOrderCount, isInitialLoad]);
 
 
   const handleUpdateStatus = async (orderId: string, newStatus: string | undefined) => {
@@ -83,11 +132,24 @@ export default function KitchenDisplayClientPage() {
   };
 
 
-  const pendingOrdersSorted = useMemo(() => {
-    return orders
-      .filter(order => order.status !== "Completed" && !order.customerPaid)
-      .sort((a, b) => a.createdAt - b.createdAt); // Oldest pending first
-  }, [orders]);
+  const filteredOrdersSorted = useMemo(() => {
+    let filteredOrders = orders;
+    
+    if (!showServedOrders) {
+      // Show only pending orders (original behavior)
+      filteredOrders = orders.filter(order => order.status !== "Completed" && !order.customerPaid);
+    } else {
+      // Show all orders including served ones
+      filteredOrders = orders.filter(order => !order.customerPaid);
+    }
+    
+    return filteredOrders.sort((a, b) => {
+      // Sort by status first (pending orders first), then by creation time
+      if (a.status === "Completed" && b.status !== "Completed") return 1;
+      if (a.status !== "Completed" && b.status === "Completed") return -1;
+      return a.createdAt - b.createdAt; // Oldest first
+    });
+  }, [orders, showServedOrders]);
 
   if (!mounted) {
     return <div className="text-center py-10">バー画面を読み込み中...</div>;
@@ -97,11 +159,19 @@ export default function KitchenDisplayClientPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-b pb-4">
         <h1 className="text-3xl font-bold text-primary">バー</h1>
+        <Button
+          variant={showServedOrders ? "default" : "outline"}
+          onClick={() => setShowServedOrders(!showServedOrders)}
+          className="flex items-center gap-2"
+        >
+          {showServedOrders ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+          {showServedOrders ? "完了済みを非表示" : "完了済みを表示"}
+        </Button>
       </div>
 
-      {pendingOrdersSorted.length > 0 ? (
+      {filteredOrdersSorted.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {pendingOrdersSorted.map((order) => (
+          {filteredOrdersSorted.map((order) => (
             <KitchenOrderCard
               key={order.id}
               order={order}
