@@ -55,10 +55,12 @@ jobs:
       - name: Setup Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Deploy to Firebase App Hosting
+      - name: Authenticate to Firebase
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           echo "$FIREBASE_SERVICE_ACCOUNT" > "$HOME/firebase-service-account.json"
-          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase-service-account.json"
-          firebase deploy --only apphosting --project nishikicho-event-app --non-interactive
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$HOME/firebase-service-account.json" >> $GITHUB_ENV
+
+      - name: Deploy to Firebase App Hosting
+        run: firebase deploy --only apphosting --project nishikicho-event-app --non-interactive
