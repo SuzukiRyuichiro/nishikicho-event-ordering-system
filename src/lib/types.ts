@@ -11,6 +11,7 @@ export interface Order {
   customerId: string; // Required reference to customer
   customerName: string; // Denormalized for easy display
   customerPaid?: boolean; // Denormalized payment status for kitchen filtering
+  eventId: string; // Reference to the event this order belongs to
   items: OrderItem[];
   status: string; // Order status: "Pending", "Completed", "Cancelled", etc.
   createdAt: number; // Unix timestamp
@@ -20,12 +21,35 @@ export interface Order {
 export interface Customer {
   id: string;
   name: string;
+  eventId: string; // Reference to the event this customer belongs to
   guestCount?: number;
   orderCount: number;
   createdAt: number;
   orders: Order[];
   paid?: boolean;
   paidAt?: number;
+}
+
+export interface DrinkBreakdown {
+  [itemId: string]: {
+    itemName: string;
+    quantity: number;
+    totalRevenue: number;
+  };
+}
+
+export interface Event {
+  id: string;
+  name: string;
+  startDate: number; // Unix timestamp
+  endDate?: number; // Unix timestamp, nullable for active events
+  status: 'active' | 'completed';
+  totalCustomers: number;
+  totalOrders: number;
+  totalRevenue: number;
+  drinkBreakdown: DrinkBreakdown;
+  createdAt: number;
+  completedAt?: number;
 }
 
 export interface MenuItem {

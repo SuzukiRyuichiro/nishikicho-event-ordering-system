@@ -1,7 +1,7 @@
 
 import Link from 'next/link';
 import NavItem from './NavItem';
-import { Users, Martini, GlassWater } from 'lucide-react';
+import { Users, Martini, GlassWater, Settings } from 'lucide-react';
 
 export default function Header() {
   return (
@@ -19,6 +19,9 @@ export default function Header() {
           </NavItem>
           <NavItem href="/menu" icon={<GlassWater className="h-4 w-4 sm:h-5 sm:w-5" />}>
             飲み物管理
+          </NavItem>
+          <NavItem href="/admin" icon={<Settings className="h-4 w-4 sm:h-5 sm:w-5" />}>
+            管理
           </NavItem>
         </nav>
       </div>

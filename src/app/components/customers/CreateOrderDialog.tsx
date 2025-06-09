@@ -10,6 +10,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { createDefaultEventIfNeeded } from "@/lib/eventUtils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -142,18 +143,22 @@ export default function CreateOrderDialog({
   const handleSubmit = async () => {
     if (currentOrderItems.length === 0) {
       toast({
-        title: "Error",
-        description: "Please add at least one item to the order.",
+        title: "エラー",
+        description: "注文に少なくとも1つの商品を追加してください。",
         variant: "destructive",
       });
       return;
     }
 
     try {
+      // Get or create active event
+      const eventId = await createDefaultEventIfNeeded();
+      
       // Create order data for Firestore
       const orderData = {
         customerId,
         customerName,
+        eventId: eventId,
         items: currentOrderItems.map((item) => ({
           id: item.id,
           itemId: item.itemId,

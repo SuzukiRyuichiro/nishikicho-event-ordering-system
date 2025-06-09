@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { createDefaultEventIfNeeded } from "@/lib/eventUtils";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,8 +34,8 @@ export default function CreateCustomerDialog({ onCreateCustomer }: CreateCustome
     e.preventDefault();
     if (!customerName.trim()) {
       toast({
-        title: "Error",
-        description: "Customer/Group Name cannot be empty.",
+        title: "エラー",
+        description: "お客さんの名前を入力してください。",
         variant: "destructive",
       });
       return;
@@ -43,16 +44,20 @@ export default function CreateCustomerDialog({ onCreateCustomer }: CreateCustome
     const count = parseInt(guestCount, 10);
     if (isNaN(count) || count < 0) {
       toast({
-        title: "Error",
-        description: "Number of guests must be a valid positive number.",
+        title: "エラー",
+        description: "人数は正の数値で入力してください。",
         variant: "destructive",
       });
       return;
     }
 
     try {
+      // Get or create active event
+      const eventId = await createDefaultEventIfNeeded();
+      
       const docRef = await addDoc(collection(db, "customers"), {
         name: customerName.trim(),
+        eventId: eventId,
         guestCount: count > 0 ? count : 1,
         orderCount: 0,
         createdAt: Date.now(),
@@ -60,16 +65,17 @@ export default function CreateCustomerDialog({ onCreateCustomer }: CreateCustome
       });
       // Do not call onCreateCustomer here; Firestore's onSnapshot will update the UI in real time
       toast({
-        title: "Success",
-        description: `Customer "${customerName.trim()}" created.`,
+        title: "成功",
+        description: `お客さん「${customerName.trim()}」を登録しました。`,
       });
       setCustomerName("");
       setGuestCount("1");
       setIsOpen(false);
     } catch (error) {
+      console.error("Error creating customer:", error);
       toast({
-        title: "Error",
-        description: "Failed to create customer. Please try again.",
+        title: "エラー",
+        description: "お客さんの登録に失敗しました。もう一度お試しください。",
         variant: "destructive",
       });
     }
