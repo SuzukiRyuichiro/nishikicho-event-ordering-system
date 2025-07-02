@@ -10,9 +10,10 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { ArrowLeft, Users, JapaneseYen, CreditCard, CupSoda, Beer } from "lucide-react";
+import { ArrowLeft, Users, JapaneseYen, CreditCard, CupSoda, Beer, Edit2, Check, X } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import { useToast } from "@/hooks/use-toast";
 import { db } from "@/lib/firebase";
@@ -29,6 +30,9 @@ export default function CustomerDetailsClientPage({
   const [orders, setOrders] = useState<Order[]>([]);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState("");
+  const [editGuestCount, setEditGuestCount] = useState(1);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,14 +43,17 @@ export default function CustomerDetailsClientPage({
         const customerSnap = await getDoc(customerRef);
         if (customerSnap.exists()) {
           const data = customerSnap.data();
-          setCustomer({
+          const customerData = {
             id: customerSnap.id,
             name: data.name,
             guestCount: data.guestCount,
             createdAt: data.createdAt,
             paid: data.paid || false,
             paidAt: data.paidAt,
-          } as Customer);
+          } as Customer;
+          setCustomer(customerData);
+          setEditName(customerData.name);
+          setEditGuestCount(customerData.guestCount || 1);
         } else {
           setCustomer(null);
         }
@@ -196,6 +203,71 @@ export default function CustomerDetailsClientPage({
     return { eventFee, alcoholicCount, nonAlcoholicCount, alcoholicTotal, nonAlcoholicTotal };
   };
 
+  const handleStartEdit = () => {
+    if (customer) {
+      setEditName(customer.name);
+      setEditGuestCount(customer.guestCount || 1);
+      setIsEditing(true);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    if (customer) {
+      setEditName(customer.name);
+      setEditGuestCount(customer.guestCount || 1);
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!customer || !editName.trim()) {
+      toast({
+        title: "エラー",
+        description: "名前を入力してください。",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (editGuestCount < 1) {
+      toast({
+        title: "エラー",
+        description: "人数は1人以上である必要があります。",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const customerRef = doc(db, "customers", customerId);
+      await updateDoc(customerRef, {
+        name: editName.trim(),
+        guestCount: editGuestCount,
+        updatedAt: Date.now(),
+      });
+
+      setCustomer({
+        ...customer,
+        name: editName.trim(),
+        guestCount: editGuestCount,
+      });
+
+      setIsEditing(false);
+
+      toast({
+        title: "更新完了",
+        description: "お客さん情報を更新しました。",
+      });
+    } catch (error) {
+      console.error("Error updating customer:", error);
+      toast({
+        title: "エラー",
+        description: "お客さん情報の更新に失敗しました。",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleMarkAsPaid = async () => {
     if (!customer) return;
 
@@ -274,20 +346,57 @@ export default function CustomerDetailsClientPage({
 
       <Card className="shadow-md">
         <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-3xl font-bold text-primary">
-                {customer.name}
-              </CardTitle>
-              <CardDescription className="text-sm text-muted-foreground flex items-center gap-4">
-                <span>来場時間: {new Date(customer.createdAt).toLocaleTimeString()}</span>
-                {customer.guestCount && customer.guestCount > 0 && (
-                  <span className="flex items-center">
-                    <Users className="mr-1 h-4 w-4 text-muted-foreground" />
-                    {customer.guestCount}人
-                  </span>
-                )}
-              </CardDescription>
+          <div className="flex justify-between sm:items-start flex-col sm:flex-row items-end">
+            <div className="flex-1">
+              {isEditing ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                      placeholder="お客さん名"
+                      className="text-2xl font-bold"
+                    />
+                    <Button size="sm" onClick={handleSaveEdit} variant="outline">
+                      <Check className="h-4 w-4" />
+                    </Button>
+                    <Button size="sm" onClick={handleCancelEdit} variant="outline">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="number"
+                      value={editGuestCount}
+                      onChange={(e) => setEditGuestCount(Math.max(1, parseInt(e.target.value) || 1))}
+                      min="1"
+                      className="w-20"
+                    />
+                    <span className="text-sm text-muted-foreground">人</span>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-3xl font-bold text-primary">
+                      {customer.name}
+                    </CardTitle>
+                    <Button size="sm" onClick={handleStartEdit} variant="ghost">
+                      <Edit2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <CardDescription className="text-sm text-muted-foreground flex items-center gap-4 justify-end sm:justify-start">
+                    <span>来場時間: {new Date(customer.createdAt).toLocaleTimeString()}</span>
+                    {customer.guestCount && customer.guestCount > 0 && (
+                      <span className="flex items-center">
+                        <Users className="mr-1 h-4 w-4 text-muted-foreground" />
+                        {customer.guestCount}人
+                      </span>
+                    )}
+                  </CardDescription>
+                </div>
+              )}
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold text-primary flex items-center justify-end">
