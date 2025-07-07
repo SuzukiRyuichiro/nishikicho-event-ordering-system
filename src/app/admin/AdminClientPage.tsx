@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, Users, Wine, DollarSign, Clock, CheckCircle, Plus, RotateCcw } from 'lucide-react';
 
@@ -26,6 +27,7 @@ export default function AdminClientPage() {
     drinkBreakdown: {} as DrinkBreakdown,
   });
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [newEventName, setNewEventName] = useState('');
   const [isCreatingEvent, setIsCreatingEvent] = useState(false);
   const [isCompletingEvent, setIsCompletingEvent] = useState(false);
@@ -110,6 +112,7 @@ export default function AdminClientPage() {
         let nonAlcoholicDrinks = 0;
         let drinkRevenue = 0;
         const drinkBreakdown: DrinkBreakdown = {};
+        const customersWithOrders: Customer[] = [];
 
         // Calculate total customers (sum of guest counts)
         customersSnapshot.docs.forEach(customerDoc => {
@@ -122,14 +125,20 @@ export default function AdminClientPage() {
 
         // Get all orders for this event by iterating through customers
         for (const customerDoc of customersSnapshot.docs) {
+          const customerData = customerDoc.data() as Customer;
           const ordersQuery = query(
             collection(db, 'customers', customerDoc.id, 'orders'),
             where('eventId', '==', activeEvent.id)
           );
           const ordersSnapshot = await getDocs(ordersQuery);
 
+          const customerOrders: Order[] = [];
           ordersSnapshot.docs.forEach(orderDoc => {
             const order = orderDoc.data() as Order;
+            customerOrders.push({
+              ...order,
+              id: orderDoc.id
+            });
 
             // Calculate drink breakdown and revenue
             order.items.forEach(item => {
@@ -161,7 +170,17 @@ export default function AdminClientPage() {
               }
             });
           });
+
+          // Add customer with orders to the list
+          customersWithOrders.push({
+            ...customerData,
+            id: customerDoc.id,
+            orders: customerOrders
+          });
         }
+
+        // Update customers state
+        setCustomers(customersWithOrders);
 
         // Calculate total revenue (participants + drinks)
         const totalRevenue = participantRevenue + drinkRevenue;
@@ -374,6 +393,75 @@ export default function AdminClientPage() {
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Attendees List */}
+            {customers.length > 0 && (
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="attendees">
+                  <AccordionTrigger>
+                    参加者一覧 ({customers.length}人)
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-3">
+                      {customers.map((customer) => {
+                        const totalDrinks = customer.orders.reduce((sum, order) =>
+                          sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0);
+                        const totalOrderValue = customer.orders.reduce((sum, order) =>
+                          sum + order.items.reduce((itemSum, item) => {
+                            const menuItem = menuItems.find(m => m.id === item.itemId);
+                            return itemSum + (item.quantity * (menuItem?.price || 500));
+                          }, 0), 0);
+
+                        return (
+                          <div key={customer.id} className="p-3 border rounded-lg bg-background">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{customer.name}</span>
+                                {customer.guestCount && customer.guestCount > 1 && (
+                                  <Badge variant="outline">
+                                    {customer.guestCount}名
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={customer.paid ? "default" : "secondary"}>
+                                  {customer.paid ? "支払済" : "未払い"}
+                                </Badge>
+                              </div>
+                            </div>
+
+                            {customer.orders.length > 0 && (
+                              <div className="space-y-2">
+                                <div className="text-sm text-muted-foreground">
+                                  注文: {totalDrinks}杯 ({formatCurrency(totalOrderValue)})
+                                </div>
+                                <div className="grid gap-1">
+                                  {customer.orders.map((order) => (
+                                    <div key={order.id} className="text-xs">
+                                      {order.items.map((item, idx) => (
+                                        <span key={idx} className="mr-3">
+                                          {item.name} x{item.quantity}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {customer.orders.length === 0 && (
+                              <div className="text-sm text-muted-foreground">
+                                注文なし
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             )}
 
             <Button
