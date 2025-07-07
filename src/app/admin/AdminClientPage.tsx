@@ -316,7 +316,7 @@ export default function AdminClientPage() {
   };
 
   const handleCustomerUpdate = (updatedCustomer: Customer) => {
-    setCustomers(customers.map(customer => 
+    setCustomers(customers.map(customer =>
       customer.id === updatedCustomer.id ? updatedCustomer : customer
     ));
   };
@@ -421,6 +421,10 @@ export default function AdminClientPage() {
                             return itemSum + (item.quantity * (menuItem?.price || 500));
                           }, 0), 0);
 
+
+                        const totalParticipationFee = (customer.guestCount || 1) * 1000
+                        const total = totalParticipationFee + totalOrderValue
+
                         return (
                           <div key={customer.id} className="p-3 border rounded-lg bg-background">
                             <div className="flex items-center justify-between mb-2">
@@ -433,8 +437,8 @@ export default function AdminClientPage() {
                                 )}
                               </div>
                               <div className="flex items-center gap-2">
-                                <CustomerNotesModal 
-                                  customer={customer} 
+                                <CustomerNotesModal
+                                  customer={customer}
                                   onCustomerUpdate={handleCustomerUpdate}
                                 />
                                 <Badge variant={customer.paid ? "default" : "secondary"}>
@@ -446,7 +450,7 @@ export default function AdminClientPage() {
                             {customer.orders.length > 0 && (
                               <div className="space-y-2">
                                 <div className="text-sm text-muted-foreground">
-                                  注文: {totalDrinks}杯 ({formatCurrency(totalOrderValue)})
+                                  注文: {totalDrinks}杯 ({formatCurrency(total)})
                                 </div>
                                 <div className="grid gap-1">
                                   {customer.orders.map((order) => (
