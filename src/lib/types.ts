@@ -18,6 +18,13 @@ export interface Order {
   updatedAt: number; // Unix timestamp
 }
 
+export interface CustomerNote {
+  id: string;
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface Customer {
   id: string;
   name: string;
@@ -28,6 +35,7 @@ export interface Customer {
   orders: Order[];
   paid?: boolean;
   paidAt?: number;
+  notes?: CustomerNote[];
 }
 
 export interface DrinkBreakdown {

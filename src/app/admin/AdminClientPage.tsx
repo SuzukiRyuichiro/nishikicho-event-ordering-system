@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import CustomerNotesModal from '@/components/CustomerNotesModal';
 import { useToast } from '@/hooks/use-toast';
 import { CalendarDays, Users, Wine, DollarSign, Clock, CheckCircle, Plus, RotateCcw } from 'lucide-react';
 
@@ -171,11 +172,12 @@ export default function AdminClientPage() {
             });
           });
 
-          // Add customer with orders to the list
+          // Add customer with orders to the list (including notes)
           customersWithOrders.push({
             ...customerData,
             id: customerDoc.id,
-            orders: customerOrders
+            orders: customerOrders,
+            notes: customerData.notes || []
           });
         }
 
@@ -313,6 +315,12 @@ export default function AdminClientPage() {
     }).format(amount);
   };
 
+  const handleCustomerUpdate = (updatedCustomer: Customer) => {
+    setCustomers(customers.map(customer => 
+      customer.id === updatedCustomer.id ? updatedCustomer : customer
+    ));
+  };
+
   if (!mounted) {
     return <div className="text-center py-10">管理画面を読み込み中...</div>;
   }
@@ -425,6 +433,10 @@ export default function AdminClientPage() {
                                 )}
                               </div>
                               <div className="flex items-center gap-2">
+                                <CustomerNotesModal 
+                                  customer={customer} 
+                                  onCustomerUpdate={handleCustomerUpdate}
+                                />
                                 <Badge variant={customer.paid ? "default" : "secondary"}>
                                   {customer.paid ? "支払済" : "未払い"}
                                 </Badge>

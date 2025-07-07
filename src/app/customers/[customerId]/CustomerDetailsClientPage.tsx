@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type { Customer, Order, MenuItem } from "@/lib/types";
 import OrderListForCustomer from "@/app/components/customers/OrderListForCustomer";
+import CustomerNotesModal from "@/components/CustomerNotesModal";
 import {
   Card,
   CardContent,
@@ -50,6 +51,7 @@ export default function CustomerDetailsClientPage({
             createdAt: data.createdAt,
             paid: data.paid || false,
             paidAt: data.paidAt,
+            notes: data.notes || [],
           } as Customer;
           setCustomer(customerData);
           setEditName(customerData.name);
@@ -385,6 +387,10 @@ export default function CustomerDetailsClientPage({
                     <Button size="sm" onClick={handleStartEdit} variant="ghost">
                       <Edit2 className="h-4 w-4" />
                     </Button>
+                    <CustomerNotesModal 
+                      customer={customer} 
+                      onCustomerUpdate={setCustomer}
+                    />
                   </div>
                   <CardDescription className="text-sm text-muted-foreground flex items-center gap-4 justify-end sm:justify-start">
                     <span>来場時間: {new Date(customer.createdAt).toLocaleTimeString()}</span>
